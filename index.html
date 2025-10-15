@@ -3,1652 +3,794 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arpit Jain - Data Scientist</title>
-    <meta name="description" content="Arpit Jain — Data Scientist & ML Engineer. Projects, case studies, and contact.">
-    <meta property="og:title" content="Arpit Jain — Data Scientist & ML Engineer">
-    <meta property="og:description" content="Selected projects, case studies, and how I work.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://arpitjainnn14.github.io/Portfolio-1/images/portfolio.png">
-    <meta property="og:url" content="https://arpitjainnn14.github.io/Portfolio-1/">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="icon" type="image/png" href="images/portfolio.png">
-    <!-- Google Fonts: Friendly sans-serif and handwritten -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
+    <title>Arpit Jain - Data Scientist & ML Engineer</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: linear-gradient(120deg, #0a1628 0%, #1a2942 50%, #0f1e33 100%);
-            color: #e8edf2;
-            margin: 0;
-            min-height: 100vh;
-            /* Subtle animated gradient */
-            background-size: 200% 200%;
-            animation: bgmove 12s ease-in-out infinite;
-            position: relative;
-        }
-        @keyframes bgmove {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
-        }
-        .handwritten {
-            font-family: 'Indie Flower', cursive;
-            font-size: 1.5rem;
-            color: #00d9ff;
-        }
-        .doodle {
-            width: 120px;
-            height: 120px;
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            z-index: 1;
-            opacity: 0.7;
-            /* Add bounce animation */
-            animation: doodle-bounce 2.5s infinite cubic-bezier(.68,-0.55,.27,1.55);
-        }
-        @keyframes doodle-bounce {
-            0%, 100% { transform: translateY(0);}
-            50% { transform: translateY(-18px);}
-        }
-        /* Section entrance animation is defined in css/style.css */
-        /* Scroll indicator arrow */
-        .scroll-indicator {
-            position: absolute;
-            left: 50%;
-            bottom: 18px;
-            transform: translateX(-50%);
-            z-index: 10;
-            animation: arrow-bounce 1.6s infinite;
-            opacity: 0.7;
-        }
-        @keyframes arrow-bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0);}
-            50% { transform: translateX(-50%) translateY(12px);}
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem 2.5rem;
-            position: relative;
-        }
-        /* Floating side doodles */
-        .side-doodle {
-            position: fixed;
-            z-index: 0;
-            opacity: 0.13;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .side-doodle.left {
-            top: 10vh;
-            left: 0;
-            width: 90px;
-            height: 300px;
-        }
-        .side-doodle.right {
-            bottom: 8vh;
-            right: 0;
-            width: 100px;
-            height: 320px;
-        }
-        @media (max-width: 900px) {
-            .container { max-width: 98vw; padding: 1rem 0.5rem; }
-            .side-doodle { display: none; }
-        }
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 2rem 0 1rem 0;
-            background: none;
-        }
-        .logo {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #00d9ff;
-            letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-        }
-        nav {
-            display: flex;
-            gap: 1.5rem;
-        }
-        nav a {
-            text-decoration: none;
-            color: #e8edf2;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            transition: border 0.2s, color 0.2s;
-        }
-        nav a:hover {
-            border-bottom: 2px solid #00d9ff;
-            color: #00d9ff;
-        }
-        .hero {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-            border-radius: 24px;
-            box-shadow: 0 4px 24px rgba(0, 217, 255, 0.15), inset 0 1px 0 rgba(0, 217, 255, 0.1);
-            padding: 2.5rem 2rem 2rem 2rem;
-            gap: 2.5rem;
-            border: 1px solid rgba(0, 217, 255, 0.2);
-        }
-        .hero-photo {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .hero-photo img {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid #00d9ff;
-            box-shadow: 0 6px 24px rgba(0, 217, 255, 0.4), 0 0 40px rgba(0, 217, 255, 0.2);
-        }
-        .hero-content {
-            flex: 2;
-        }
-        .fun-fact {
-            background: rgba(0, 217, 255, 0.1);
-            border-left: 4px solid #00d9ff;
-            padding: 0.7rem 1rem;
-            border-radius: 8px;
-            margin: 1.5rem 0 0.5rem 0;
-            font-size: 1rem;
-            color: #e8edf2;
-        }
-        .now {
-            margin-top: 3rem;
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-            border-radius: 18px;
-            box-shadow: 0 2px 12px rgba(0, 217, 255, 0.15);
-            padding: 2rem 2rem 1.5rem 2rem;
-            border: 1px solid rgba(0, 217, 255, 0.15);
-        }
-        .about {
-            margin-top: 3rem;
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-            border-radius: 18px;
-            box-shadow: 0 2px 12px rgba(0, 217, 255, 0.15);
-            padding: 2rem 2rem 1.5rem 2rem;
-            border: 1px solid rgba(0, 217, 255, 0.15);
-        }
-        .education {
-            margin-top: 3rem;
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-            border-radius: 18px;
-            box-shadow: 0 2px 12px rgba(0, 217, 255, 0.15);
-            padding: 2rem 2rem 1.5rem 2rem;
-            border: 1px solid rgba(0, 217, 255, 0.15);
-        }
-        .skills, .projects, .contact {
-            margin-top: 3rem;
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-            border-radius: 18px;
-            box-shadow: 0 2px 12px rgba(0, 217, 255, 0.15);
-            padding: 2rem 2rem 1.5rem 2rem;
-            border: 1px solid rgba(0, 217, 255, 0.15);
-        }
-        .section-title {
-            font-size: 1.7rem;
-            color: #00d9ff;
-            margin-bottom: 1.2rem;
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-        }
-        .skills-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-        }
-        .skill {
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(58, 123, 213, 0.15));
-            color: #e8edf2;
-            border-radius: 12px;
-            padding: 0.7rem 1.2rem;
-            font-size: 1rem;
-            border: 1px solid rgba(0, 217, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-        .skill:hover {
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.25), rgba(58, 123, 213, 0.25));
-            border-color: #00d9ff;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-        }
-        .projects-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .project {
-            background: #f9f6f2;
-            border-radius: 10px;
-            padding: 1rem 1.2rem;
-            box-shadow: 0 1px 4px rgba(61,64,91,0.04);
-        }
-        .project-title {
-            font-weight: 600;
-            color: #00d9ff;
-            margin-bottom: 0.3rem;
-            text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
-        }
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .contact-form input, .contact-form textarea {
-            padding: 0.7rem 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 217, 255, 0.3);
-            font-size: 1rem;
-            background: rgba(10, 22, 40, 0.5);
-            color: #e8edf2;
-            transition: border-color 0.3s;
-        }
-        .contact-form input:focus, .contact-form textarea:focus {
-            outline: none;
-            border-color: #00d9ff;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-        }
-        .contact-form button {
-            background: linear-gradient(135deg, #00d9ff, #3a7bd5);
-            color: #0a1628;
-            border: none;
-            border-radius: 8px;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-            font-family: 'Space Grotesk', sans-serif;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        .contact-form button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
-        }
-        .footer {
-            text-align: center;
-            color: #bcbcbc;
-            font-size: 1rem;
-            margin: 3rem 0 1rem 0;
-        }
-        .section-alt {
-            background: linear-gradient(135deg, #0f1e33 0%, #1a2942 100%);
-        }
-        .section-blue {
-            background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-        }
-        .polaroid {
-            background: linear-gradient(135deg, #0f1e33 0%, #1a2942 100%);
-            border: 1px solid rgba(0, 217, 255, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 217, 255, 0.1);
-            padding: 1rem;
-            border-radius: 12px;
-            margin: 1rem;
-            display: inline-block;
-            transform: rotate(-2deg);
-            transition: all 0.3s ease;
-        }
-        .polaroid:hover {
-            transform: rotate(0deg) translateY(-5px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 60px rgba(0, 217, 255, 0.2);
-            border-color: #00d9ff;
-        }
-        .badge {
-            display: inline-block;
-            background: rgba(58, 123, 213, 0.2);
-            color: #3a7bd5;
-            border: 1px solid rgba(58, 123, 213, 0.4);
-            padding: 0.18rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            margin-left: 0.4rem;
-            box-shadow: 0 0 10px rgba(58, 123, 213, 0.2);
-        }
-        /* Mobile Menu Styles */
-        .mobile-menu-btn {
-            display: none;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 44px;
-            height: 44px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            z-index: 1001;
-            position: relative;
-        }
-        
-        .hamburger-line {
-            width: 100%;
-            height: 3px;
-            background: #00d9ff;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
-        }
-        
-        .mobile-menu-btn.active .hamburger-line:nth-child(1) {
-            transform: rotate(45deg) translateY(10px);
-        }
-        
-        .mobile-menu-btn.active .hamburger-line:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .mobile-menu-btn.active .hamburger-line:nth-child(3) {
-            transform: rotate(-45deg) translateY(-10px);
-        }
-        
-        /* Tablet Styles (768px - 1024px) */
-        @media (max-width: 1024px) {
-            .container {
-                max-width: 95vw;
-                padding: 1.5rem 1.5rem;
-            }
-            
-            .hero {
-                padding: 2rem 1.5rem;
-            }
-            
-            .section-title {
-                font-size: 1.6rem;
-            }
-            
-            .skills-list {
-                gap: 1rem;
-            }
-        }
-        
-        /* Mobile Landscape & Small Tablets (768px - 900px) */
-        @media (max-width: 900px) {
-            .hero { 
-                flex-direction: column; 
-                gap: 1.5rem;
-                padding: 2rem 1.5rem;
-            }
-            
-            .hero-photo img { 
-                width: 100px; 
-                height: 100px; 
-            }
-            
-            .side-doodle { display: none; }
-            
-            nav {
-                gap: 1.2rem;
-            }
-            
-            .handwritten {
-                font-size: 1.3rem;
-            }
-        }
-        
-        /* Mobile Portrait & Small Devices (up to 768px) */
-        @media (max-width: 768px) {
-            /* Hide desktop nav, show mobile menu */
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            nav {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 75%;
-                max-width: 320px;
-                height: 100vh;
-                background: linear-gradient(135deg, #1a2942 0%, #0f1e33 100%);
-                flex-direction: column;
-                gap: 0;
-                padding: 80px 20px 40px;
-                transition: right 0.3s ease;
-                z-index: 1000;
-                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
-                overflow-y: auto;
-            }
-            
-            nav.active {
-                right: 0;
-            }
-            
-            nav a {
-                padding: 1rem 1.5rem;
-                border-bottom: 1px solid rgba(0, 217, 255, 0.1);
-                font-size: 1.1rem;
-                width: 100%;
-                text-align: left;
-            }
-            
-            nav a:hover {
-                background: rgba(0, 217, 255, 0.1);
-                border-left: 3px solid #00d9ff;
-            }
-            
-            #theme-toggle {
-                margin: 1.5rem 1.5rem 0 1.5rem !important;
-                width: calc(100% - 3rem);
-                padding: 0.8rem 1rem !important;
-                font-size: 1.1rem;
-            }
-            
-            /* Mobile overlay for menu */
-            body.menu-open::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                backdrop-filter: blur(2px);
-            }
-            
-            .container {
-                max-width: 100%;
-                padding: 1rem 1rem;
-            }
-            
-            header {
-                padding: 1rem 0;
-            }
-            
-            .logo {
-                font-size: 1.5rem;
-            }
-            
-            .hero {
-                padding: 1.5rem 1rem;
-                gap: 1rem;
-            }
-            
-            .hero-title {
-                font-size: 1.8rem;
-                line-height: 1.3;
-            }
-            
-            .hero-intro {
-                font-size: 1rem;
-                line-height: 1.6;
-            }
-            
-            .hero-photo img {
-                width: 90px;
-                height: 90px;
-            }
-            
-            .handwritten {
-                font-size: 1.2rem;
-            }
-            
-            .fun-fact {
-                font-size: 0.9rem;
-                padding: 0.6rem 0.8rem;
-            }
-            
-            .about, .skills, .projects, .contact, .now, .education {
-                padding: 1.5rem 1rem;
-                margin-top: 2rem;
-            }
-            
-            .section-title {
-                font-size: 1.4rem;
-            }
-            
-            .skills-list {
-                gap: 0.8rem;
-            }
-            
-            .skill {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-                width: 100%;
-            }
-            
-            .polaroid {
-                margin: 0.5rem 0;
-                padding: 1rem 0.8rem;
-            }
-            
-            .project-title {
-                font-size: 1rem;
-            }
-            
-            .badge {
-                font-size: 0.75rem;
-                padding: 0.15rem 0.4rem;
-            }
-            
-            /* Optimize form for mobile */
-            .contact-form input,
-            .contact-form textarea {
-                padding: 0.8rem 1rem;
-                font-size: 16px; /* Prevents zoom on iOS */
-                min-height: 44px;
-            }
-            
-            .contact-form textarea {
-                min-height: 120px;
-            }
-            
-            .contact-form button {
-                padding: 1rem 1.5rem;
-                font-size: 1rem;
-                min-height: 48px;
-                width: 100%;
-            }
-            
-            /* Hide some decorative elements on mobile for performance */
-            .doodle,
-            .coffee-steam {
-                display: none;
-            }
-            
-            /* Reduce particle count on mobile */
-            .particle {
-                width: 2px;
-                height: 2px;
-            }
-            
-            /* Make footer more compact */
-            .footer {
-                font-size: 0.85rem;
-                padding: 0 1rem;
-            }
-            
-            #footer-doodle {
-                width: 36px;
-                height: 36px;
-            }
-        }
-        
-        /* Small Mobile Devices (up to 480px) */
-        @media (max-width: 480px) {
-            .container {
-                padding: 0.8rem 0.8rem;
-            }
-            
-            .hero {
-                padding: 1.2rem 0.8rem;
-            }
-            
-            .hero-title {
-                font-size: 1.5rem;
-            }
-            
-            .hero-intro {
-                font-size: 0.95rem;
-            }
-            
-            .hero-photo img {
-                width: 80px;
-                height: 80px;
-                border-width: 3px;
-            }
-            
-            .handwritten {
-                font-size: 1.1rem;
-            }
-            
-            .section-title {
-                font-size: 1.3rem;
-            }
-            
-            .about, .skills, .projects, .contact, .now, .education {
-                padding: 1.2rem 0.8rem;
-                margin-top: 1.5rem;
-            }
-            
-            blockquote {
-                font-size: 0.9rem;
-                padding-left: 0.8rem;
-            }
-            
-            .fun-fact {
-                font-size: 0.85rem;
-            }
-            
-            nav {
-                width: 85%;
-                max-width: 280px;
-            }
-            
-            nav a {
-                padding: 0.9rem 1.2rem;
-                font-size: 1rem;
-            }
-        }
-        
-        /* Extra Small Devices (up to 320px) */
-        @media (max-width: 320px) {
-            .logo {
-                font-size: 1.3rem;
-            }
-            
-            .hero-title {
-                font-size: 1.3rem;
-            }
-            
-            .hero-photo img {
-                width: 70px;
-                height: 70px;
-            }
-            
-            .section-title {
-                font-size: 1.2rem;
-            }
-            
-            nav {
-                width: 90%;
-            }
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="images/professional-portfolio.png" href="favicon.ico">
 
-        /* Add paper texture background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 25% 25%, #f9f6f2 1px, transparent 1px),
-                radial-gradient(circle at 75% 75%, #e0e0e0 0.5px, transparent 0.5px);
-            background-size: 50px 50px, 30px 30px;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Add handwritten notes scattered around */
-        .handwritten-note {
-            position: absolute;
-            font-family: 'Indie Flower', cursive;
-            color: rgba(168, 197, 224, 0.5);
-            font-size: 0.9rem;
-            transform: rotate(var(--rotation, -5deg));
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Fun hover effects for skills */
-        .skill:hover {
-            animation: wiggle 0.5s ease-in-out;
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(-3deg) scale(1.05); }
-            75% { transform: rotate(3deg) scale(1.05); }
-        }
-
-        /* Add typewriter effect for hero title */
-        .typewriter {
-            overflow: hidden;
-            border-right: 0.15em solid #00d9ff;
-            white-space: nowrap;
-            margin: 0 auto;
-            letter-spacing: 0.05em;
-            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: #00d9ff; }
-        }
-
-        /* Add coffee steam animation */
-        .coffee-steam {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            opacity: 0.3;
-        }
-
-        .steam {
-            animation: steam-rise 2s ease-in-out infinite;
-        }
-
-        @keyframes steam-rise {
-            0% { transform: translateY(0) scale(1); opacity: 0.3; }
-            50% { transform: translateY(-20px) scale(1.1); opacity: 0.1; }
-            100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
-        }
-        
-        /* Particle background */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(0, 217, 255, 0.3);
-            border-radius: 50%;
-            animation: float-particle linear infinite;
-            box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
-        }
-        
-        @keyframes float-particle {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.3;
-            }
-            90% {
-                opacity: 0.3;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-        
-        /* Glitch effect for titles */
-        .glitch {
-            position: relative;
-        }
-        
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-        }
-        
-        .glitch:hover::before {
-            animation: glitch-1 0.3s linear;
-            color: #00d9ff;
-            z-index: -1;
-        }
-        
-        .glitch:hover::after {
-            animation: glitch-2 0.3s linear;
-            color: #3a7bd5;
-            z-index: -2;
-        }
-        
-        @keyframes glitch-1 {
-            0%, 14%, 15%, 49%, 50%, 99%, 100% {
-                opacity: 0;
-                transform: translate3d(0, 0, 0);
-            }
-            1%, 13%, 16%, 48%, 51%, 98% {
-                opacity: 0.8;
-                transform: translate3d(-2px, 0, 0);
-            }
-        }
-        
-        @keyframes glitch-2 {
-            0%, 24%, 25%, 74%, 75%, 99%, 100% {
-                opacity: 0;
-                transform: translate3d(0, 0, 0);
-            }
-            1%, 23%, 26%, 73%, 76%, 98% {
-                opacity: 0.8;
-                transform: translate3d(2px, 0, 0);
-            }
-        }
-        
-        /* Neon glow effect */
-        .neon-glow {
-            text-shadow: 
-                0 0 5px #00d9ff,
-                0 0 10px #00d9ff,
-                0 0 15px #00d9ff,
-                0 0 20px #00d9ff;
-            animation: neon-flicker 2s infinite alternate;
-        }
-        
-        @keyframes neon-flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                text-shadow: 
-                    0 0 5px #00d9ff,
-                    0 0 10px #00d9ff,
-                    0 0 15px #00d9ff,
-                    0 0 20px #00d9ff;
-            }
-            20%, 24%, 55% {
-                text-shadow: none;
-            }
-        }
-        
-        /* Floating action button */
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(45deg, #00d9ff, #3a7bd5);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(224, 122, 95, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            z-index: 1000;
-            animation: fab-pulse 2s infinite;
-        }
-        
-        .fab:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 8px 30px rgba(224, 122, 95, 0.6);
-        }
-        
-        @keyframes fab-pulse {
-            0%, 100% {
-                box-shadow: 0 4px 20px rgba(224, 122, 95, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 30px rgba(224, 122, 95, 0.8);
-            }
-        }
-        
-        /* Modal for fun interactions */
-        .fun-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .fun-modal-content {
-            background: linear-gradient(135deg, #fff, #f9f6f2);
-            padding: 3rem;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            max-width: 500px;
-            animation: modal-bounce 0.5s ease-out;
-        }
-        
-        @keyframes modal-bounce {
-            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
-            50% { transform: scale(1.05) rotate(2deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        
-        /* Interactive skill bars */
-        .skill-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(10, 22, 40, 0.6);
-            border-radius: 4px;
-            margin-top: 8px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(0, 217, 255, 0.2);
-        }
-        
-        .skill-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00d9ff, #3a7bd5);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 2s ease-in-out;
-            position: relative;
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
-        }
-        
-        .skill-progress::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: skill-shine 2s infinite;
-        }
-        
-        @keyframes skill-shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        /* Sound wave animation */
-        .sound-wave {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            margin-left: 10px;
-        }
-        
-        .sound-bar {
-            width: 3px;
-            background: #00d9ff;
-            border-radius: 2px;
-            animation: sound-wave 1.2s ease-in-out infinite;
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.6);
-        }
-        
-        .sound-bar:nth-child(1) { height: 10px; animation-delay: 0s; }
-        .sound-bar:nth-child(2) { height: 16px; animation-delay: 0.1s; }
-        .sound-bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
-        .sound-bar:nth-child(4) { height: 18px; animation-delay: 0.3s; }
-        .sound-bar:nth-child(5) { height: 8px; animation-delay: 0.4s; }
-        
-        @keyframes sound-wave {
-            0%, 100% { transform: scaleY(0.3); }
-            50% { transform: scaleY(1); }
-        }
-        
-        /* Music note floating animation */
-        .music-note {
-            position: fixed;
-            font-size: 1.5rem;
-            color: #00d9ff;
-            animation: float-up 3s ease-out forwards;
-            pointer-events: none;
-            z-index: 1000;
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
-        }
-
-        @keyframes float-up {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-    </style>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Arpit Jain",
-      "jobTitle": "Data Scientist",
-      "url": "https://example.com/",
-      "sameAs": [
-        "https://github.com/arpitjainnn14",
-        "https://www.linkedin.com/in/arpitjain2004/",
-        "https://www.kaggle.com/arpit14jain"
-      ]
-    }
-    </script>
 </head>
 <body>
-    <!-- Particle background -->
-    <div class="particles" id="particles"></div>
-    <!-- Floating doodles on sides - Data network nodes -->
-    <svg class="side-doodle left" viewBox="0 0 90 300" fill="none">
-        <path d="M30,20 Q60,60 20,120 Q50,180 10,240 Q40,280 80,260" stroke="#00d9ff" stroke-width="2" fill="none" opacity="0.4"/>
-        <circle cx="45" cy="60" r="8" fill="rgba(0, 217, 255, 0.2)" stroke="#00d9ff" stroke-width="2"/>
-        <circle cx="60" cy="200" r="6" fill="rgba(58, 123, 213, 0.2)" stroke="#3a7bd5" stroke-width="2"/>
-        <line x1="45" y1="60" x2="60" y2="200" stroke="#00d9ff" stroke-width="1" opacity="0.3"/>
-    </svg>
-    <svg class="side-doodle right" viewBox="0 0 100 320" fill="none">
-        <path d="M70,30 Q40,90 90,160 Q60,210 100,270 Q70,310 20,290" stroke="#3a7bd5" stroke-width="2" fill="none" opacity="0.4"/>
-        <circle cx="80" cy="120" r="8" fill="rgba(0, 217, 255, 0.2)" stroke="#00d9ff" stroke-width="2"/>
-        <circle cx="40" cy="250" r="6" fill="rgba(58, 123, 213, 0.2)" stroke="#3a7bd5" stroke-width="2"/>
-        <line x1="80" y1="120" x2="40" y2="250" stroke="#3a7bd5" stroke-width="1" opacity="0.3"/>
-    </svg>
-    <div class="container">
-        <header>
-            <a href="#home" style="text-decoration:none;">
-                <div class="logo">Arpit Jain</div>
-            </a>
-            <button id="mobile-menu-toggle" aria-label="Toggle mobile menu" class="mobile-menu-btn">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-            <nav aria-label="Primary Navigation" id="main-nav">
-                <a href="#about">About</a>
-                <a href="#education">Education</a>
-                <a href="#skills">Skills</a>
-                <a href="#projects">Projects</a>
-                <a href="#contact">Contact</a>
-                <a href="Resume/ArpitJain_DataScientist_Resume.pdf" download style="color:#00d9ff; font-weight:600;">Resume <i class="fas fa-download" style="margin-left:0.3rem;"></i></a>
-                <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme" style="margin-left:0.5rem; background:none; border:1px solid rgba(0, 217, 255, 0.3); color:#00d9ff; padding:0.4rem 0.6rem; border-radius:8px; cursor:pointer; transition: all 0.3s;">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </nav>
-        </header>
-        <main id="main-content">
-        <section class="hero" id="home">
-        <div class="hero-photo">
-            <img src="images/photo.jpg" alt="Portrait of Arpit Jain" loading="lazy">
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
+    
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="gradient-text">&lt;AJ/&gt;</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        <div class="hero-content">
-            <div class="handwritten">Hi, I'm Arpit! 
-                <span class="sound-wave" id="sound-wave" style="display: none;">
-                    <div class="sound-bar"></div>
-                    <div class="sound-bar"></div>
-                    <div class="sound-bar"></div>
-                    <div class="sound-bar"></div>
-                    <div class="sound-bar"></div>
-                </span>
-            </div>
-            <h1 class="hero-title typewriter glitch" data-text="Data Scientist & ML Engineer">Data Scientist & ML Engineer</h1>
-            <div class="hero-intro">I love turning messy data into meaningful stories and building things that make life easier. Welcome to my cozy corner of the web!</div>
-            <blockquote style="font-style:italic; color:#a8c5e0; margin:1rem 0 0.5rem 0; border-left:3px solid #00d9ff; padding-left:1rem;">
-                "The best way to predict the future is to invent it." — Alan Kay
-            </blockquote>
-            <div class="fun-fact">Fun fact: I drink at least 3 cups of tea while coding and my best ideas come during late-night study sessions ☕️</div>
-        </div>
-    </section>
-    <!-- Add a "Now" section after hero -->
-    <section class="now section-fade section-alt" id="now">
-        <div class="section-title" style="color:#00d9ff;">What I'm Up To Now</div>
-        <ul style="font-size:1.1rem; margin:0; padding-left:1.2rem;">
-            <li>Learning about Generative AI and LLMs</li>
-            <li>Experimenting with data viz using D3.js</li>
-            <li>Trying to brew the perfect cup of coffee ☕</li>
-        </ul>
-    </section>
-        
-        
-        
-        <section class="about section-fade" id="about" style="position:relative;">
-            <!-- Data node network doodle -->
-            <svg class="twinkle" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute; top:-10px; right:10px; opacity:0.7;">
-                <circle cx="24" cy="24" r="8" stroke="#00d9ff" stroke-width="2" fill="rgba(0, 217, 255, 0.1)"/>
-                <circle cx="10" cy="10" r="4" stroke="#3a7bd5" stroke-width="2" fill="rgba(58, 123, 213, 0.2)"/>
-                <circle cx="38" cy="10" r="4" stroke="#3a7bd5" stroke-width="2" fill="rgba(58, 123, 213, 0.2)"/>
-                <circle cx="10" cy="38" r="4" stroke="#3a7bd5" stroke-width="2" fill="rgba(58, 123, 213, 0.2)"/>
-                <line x1="24" y1="24" x2="10" y2="10" stroke="#00d9ff" stroke-width="1" opacity="0.4"/>
-                <line x1="24" y1="24" x2="38" y2="10" stroke="#00d9ff" stroke-width="1" opacity="0.4"/>
-                <line x1="24" y1="24" x2="10" y2="38" stroke="#00d9ff" stroke-width="1" opacity="0.4"/>
-            </svg>
-                <h2>Who Am I?</h2>
-            <p>I'm a curious problem-solver who enjoys blending math, code, and creativity. My journey in data science started with a fascination for patterns and a love for tinkering with numbers. I believe the best solutions come from asking the right questions and never being afraid to experiment.</p>
-            <p>When I'm not coding, you'll find me sketching, exploring new cafes, or reading about the latest in AI. Let's connect and create something awesome together!</p>
-            <div class="signature">— Arpit</div>
-        </section>
-        </main>
-        <section class="education section-fade section-blue" id="education" style="position:relative;">
-            <!-- Bar chart doodle -->
-            <svg width="56" height="40" viewBox="0 0 56 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute; top:-16px; left:-10px; opacity:0.7;">
-                <rect x="4" y="20" width="8" height="16" fill="rgba(0, 217, 255, 0.4)" stroke="#00d9ff" stroke-width="1"/>
-                <rect x="16" y="10" width="8" height="26" fill="rgba(58, 123, 213, 0.4)" stroke="#3a7bd5" stroke-width="1"/>
-                <rect x="28" y="5" width="8" height="31" fill="rgba(0, 217, 255, 0.4)" stroke="#00d9ff" stroke-width="1"/>
-                <rect x="40" y="15" width="8" height="21" fill="rgba(58, 123, 213, 0.4)" stroke="#3a7bd5" stroke-width="1"/>
-                <line x1="0" y1="36" x2="52" y2="36" stroke="#00d9ff" stroke-width="1" opacity="0.5"/>
-            </svg>
-            <div class="section-title">How I Got Here</div>
-            <div style="display:flex; flex-direction:column; gap:1.2rem;">
-                <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight:600; color:#00d9ff;">B.Tech in Computer Science</span>
-                    <span style="color:#a8c5e0;">VIT Bhopal University, 2022 - 2026</span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:1.2rem;">
-                <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight:600; color:#00d9ff;">Class XII</span>
-                    <span style="color:#a8c5e0;">MVN Aravali Hills, 2021-2022</span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:1.2rem;">
-                <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight:600; color:#00d9ff;">Class X</span>
-                    <span style="color:#a8c5e0;">DPSG Faridabad, 2019-2020</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <!-- Greeting -->
+                <div class="hero-greeting">
+                    <span class="greeting-text">Hi! I'm</span>
+                    <span class="greeting-name gradient-text">Arpit Jain</span>
+                </div>
+
+                <!-- Terminal Window -->
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="btn-close"></span>
+                            <span class="btn-minimize"></span>
+                            <span class="btn-maximize"></span>
+                        </div>
+                        <div class="terminal-title">arpit@datascience:~$</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="prompt">$</span>
+                            <span class="command" id="typingText"></span>
+                            <span class="cursor">_</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="hero-title">
+                    <span class="gradient-text">Transforming Data</span>
+                    <br>
+                    <span class="glitch" data-text="Into Intelligence">Into Intelligence</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Data Scientist & ML Engineer | Building AI Solutions That Matter
+                </p>
+                
+                <!-- Live Stats -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="10">0</div>
+                        <div class="stat-label">ML Models</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="1000000">0</div>
+                        <div class="stat-label">Data Points</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="95">0</div>
+                        <div class="stat-label">Accuracy %</div>
+                    </div>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> View Projects
+                    </a>
+                    <a href="#contact" class="btn btn-secondary">
+                        <i class="fas fa-paper-plane"></i> Get In Touch
+                    </a>
+                </div>
+
+                <!-- Scroll Indicator -->
+                <div class="scroll-indicator">
+                    <div class="mouse">
+                        <div class="wheel"></div>
+                    </div>
+                    <div class="arrow-down">
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-        <section class="skills section-fade" id="skills" style="position:relative;">
-            <!-- Hand-drawn rocket doodle -->
-            <svg id="rocket-doodle" width="48" height="64" viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute; bottom:10px; right:10px; opacity:0.7;">
-                <!-- Data pipeline flow -->
-                <circle cx="24" cy="12" r="6" stroke="#00d9ff" stroke-width="2" fill="rgba(0, 217, 255, 0.2)"/>
-                <path d="M24 18 L24 30" stroke="#00d9ff" stroke-width="2" marker-end="url(#arrowhead)"/>
-                <rect x="14" y="30" width="20" height="12" rx="2" stroke="#3a7bd5" stroke-width="2" fill="rgba(58, 123, 213, 0.2)"/>
-                <path d="M24 42 L24 54" stroke="#00d9ff" stroke-width="2"/>
-                <circle cx="24" cy="58" r="4" stroke="#00d9ff" stroke-width="2" fill="rgba(0, 217, 255, 0.3)"/>
-                <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-                        <polygon points="0 0, 10 5, 0 10" fill="#00d9ff"/>
-                    </marker>
-                </defs>
-            </svg>
-            <div class="section-title glitch" data-text="Stuff I Love Working With">Stuff I Love Working With</div>
-            <div class="skills-list">
-                <div class="skill" data-level="90">
-                🐍 Python & ML
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="90"></div>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title gradient-text">About Me</h2>
+                <p class="section-subtitle">Passionate about turning data into actionable insights</p>
+            </div>
+
+            <div class="about-content">
+                <div class="about-left">
+                    <div class="profile-card">
+                        <div class="profile-image-wrapper">
+                            <img src="images/photo.jpg" alt="Arpit Jain" class="profile-image">
+                            <div class="profile-border"></div>
+                        </div>
+                        
+                        <!-- Floating Badges -->
+                        <div class="float-badge badge-1">
+                            <i class="fas fa-brain"></i>
+                            <span>AI/ML</span>
+                        </div>
+                        <div class="float-badge badge-2">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </div>
+                        <div class="float-badge badge-3">
+                            <i class="fab fa-python"></i>
+                            <span>Python</span>
+                        </div>
+                        <div class="float-badge badge-4">
+                            <i class="fas fa-cloud"></i>
+                            <span>Cloud</span>
+                        </div>
+                    </div>
+
+                    <!-- Tech Stack -->
+                    <div class="tech-stack">
+                        <h3 class="tech-title">Tech Stack</h3>
+                        <div class="tech-icons">
+                            <div class="tech-icon" title="Python">
+                                <i class="fab fa-python"></i>
+                            </div>
+                            <div class="tech-icon" title="TensorFlow">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="tech-icon" title="Docker">
+                                <i class="fab fa-docker"></i>
+                            </div>
+                            <div class="tech-icon" title="AWS">
+                                <i class="fab fa-aws"></i>
+                            </div>
+                            <div class="tech-icon" title="Git">
+                                <i class="fab fa-git-alt"></i>
+                            </div>
+                            <div class="tech-icon" title="Database">
+                                <i class="fas fa-database"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills Radar Chart -->
+                    <div class="chart-container">
+                        <canvas id="skillsRadar"></canvas>
+                    </div>
                 </div>
+
+                <div class="about-right">
+                    <div class="about-text">
+                        <p class="about-description">
+                            Hi! I'm <span class="highlight">Arpit Jain</span>, a passionate Data Scientist and Machine Learning Engineer 
+                            currently pursuing my degree at <span class="highlight">VIT Bhopal University</span>.
+                        </p>
+                        <p class="about-description">
+                            I specialize in building <span class="highlight">end-to-end ML pipelines</span>, from data preprocessing 
+                            to model deployment. My expertise lies in <span class="highlight">Deep Learning</span>, 
+                            <span class="highlight">Computer Vision</span>, and <span class="highlight">NLP</span>.
+                        </p>
+                        <p class="about-description">
+                            I believe in the power of data to solve real-world problems and am constantly exploring 
+                            new technologies to push the boundaries of what's possible with AI.
+                        </p>
+                    </div>
+
+                    <!-- Education Timeline -->
+                    <div class="education-timeline">
+                        <h3 class="timeline-title">
+                            <i class="fas fa-graduation-cap"></i> Education
+                        </h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>B.Tech in Computer Science</h4>
+                                    <p class="timeline-institution">VIT Bhopal University</p>
+                                    <p class="timeline-date">2022 - 2026</p>
+                                    <p class="timeline-desc">Specialization in Data Science & AI</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Senior Secondary (XII)</h4>
+                                    <p class="timeline-institution">MVN Aravali Hills</p>
+                                    <p class="timeline-date">2021 - 2022</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Secondary (X)</h4>
+                                    <p class="timeline-institution">DPSG Faridabad</p>
+                                    <p class="timeline-date">2019 - 2020</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="social-links">
+                        <a href="https://github.com/arpitjainnn14" target="_blank" class="social-link">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/arpitjain2004/" target="_blank" class="social-link">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://kaggle.com/arpit14jain" target="_blank" class="social-link">
+                            <i class="fab fa-kaggle"></i>
+                        </a>
+                        <a href="mailto:arpit@example.com" class="social-link">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="skill" data-level="85">
-                📊 Data Analysis
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="85"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="80">
-                🗄️ Databases
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="80"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="75">
-                📈 Visualization
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="75"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="70">
-                🛠️ DevOps
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="70"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="88">
-                🤖 AI & Deep Learning
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="88"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="75">
-                ☁️ AWS
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="75"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="80">
-                🔗 APIs
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="80"></div>
-                </div>
-                </div>
-                <div class="skill" data-level="85">
-                📝 Prompt Engineering
-                <div class="skill-bar">
-                    <div class="skill-progress" data-width="85"></div>
-                </div>
-                </div>
+            </div>
         </div>
     </section>
-        <section class="projects section-fade section-alt" id="projects">
-        <div class="section-title">Some Things I've Built</div>
-        <div class="projects-list">
-            <div class="polaroid">
-                <div class="project-title">Early Diabetic Retinopathy Prediction <span class="badge">SVM</span></div>
-                <div class="project-desc">CNN-based model to flag early signs of diabetic retinopathy from retinal images. Trained on labeled fundus images with augmentation and transfer learning.</div>
+
+    <!-- Skills Section -->
+    <section class="skills" id="skills">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title gradient-text">Skills & Expertise</h2>
+                <p class="section-subtitle">My technical toolkit for building intelligent systems</p>
             </div>
-            <div class="polaroid">
-                <div class="project-title">TheraVox <span class="badge">DeepFace</span> <span class="badge">Librosa</span></div>
-                <div class="project-desc">Voice therapy app prototype that uses audio features to track progress over sessions. Uses MFCC features and simple ML models to detect voice quality changes.</div>
+
+            <!-- Skill Categories Grid -->
+            <div class="skills-grid">
+                <!-- Machine Learning -->
+                <div class="skill-category" data-category="ml">
+                    <div class="category-header">
+                        <div class="category-icon-wrapper">
+                            <div class="icon-glow"></div>
+                            <i class="fas fa-brain category-icon"></i>
+                        </div>
+                        <h3 class="category-title">Machine Learning</h3>
+                    </div>
+                    <div class="skill-items">
+                        <div class="skill-item" data-skill="95">
+                            <div class="skill-info">
+                                <span class="skill-name">Python</span>
+                                <span class="skill-level">95%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 95%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="90">
+                            <div class="skill-info">
+                                <span class="skill-name">TensorFlow/PyTorch</span>
+                                <span class="skill-level">90%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 90%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="92">
+                            <div class="skill-info">
+                                <span class="skill-name">Scikit-learn</span>
+                                <span class="skill-level">92%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 92%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Analysis -->
+                <div class="skill-category" data-category="data">
+                    <div class="category-header">
+                        <div class="category-icon-wrapper">
+                            <div class="icon-glow"></div>
+                            <i class="fas fa-chart-line category-icon"></i>
+                        </div>
+                        <h3 class="category-title">Data Analysis</h3>
+                    </div>
+                    <div class="skill-items">
+                        <div class="skill-item" data-skill="93">
+                            <div class="skill-info">
+                                <span class="skill-name">Pandas/NumPy</span>
+                                <span class="skill-level">93%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 93%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="87">
+                            <div class="skill-info">
+                                <span class="skill-name">Data Visualization</span>
+                                <span class="skill-level">87%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 87%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="85">
+                            <div class="skill-info">
+                                <span class="skill-name">SQL</span>
+                                <span class="skill-level">85%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 85%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Learning -->
+                <div class="skill-category" data-category="dl">
+                    <div class="category-header">
+                        <div class="category-icon-wrapper">
+                            <div class="icon-glow"></div>
+                            <i class="fas fa-project-diagram category-icon"></i>
+                        </div>
+                        <h3 class="category-title">Deep Learning</h3>
+                    </div>
+                    <div class="skill-items">
+                        <div class="skill-item" data-skill="88">
+                            <div class="skill-info">
+                                <span class="skill-name">Computer Vision</span>
+                                <span class="skill-level">88%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 88%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="82">
+                            <div class="skill-info">
+                                <span class="skill-name">NLP</span>
+                                <span class="skill-level">82%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 82%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="90">
+                            <div class="skill-info">
+                                <span class="skill-name">Neural Networks</span>
+                                <span class="skill-level">90%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 90%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools & Cloud -->
+                <div class="skill-category" data-category="tools">
+                    <div class="category-header">
+                        <div class="category-icon-wrapper">
+                            <div class="icon-glow"></div>
+                            <i class="fas fa-cloud category-icon"></i>
+                        </div>
+                        <h3 class="category-title">Tools & Cloud</h3>
+                    </div>
+                    <div class="skill-items">
+                        <div class="skill-item" data-skill="80">
+                            <div class="skill-info">
+                                <span class="skill-name">AWS/Cloud</span>
+                                <span class="skill-level">80%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 80%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="78">
+                            <div class="skill-info">
+                                <span class="skill-name">Docker</span>
+                                <span class="skill-level">78%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 78%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item" data-skill="90">
+                            <div class="skill-info">
+                                <span class="skill-name">Git/GitHub</span>
+                                <span class="skill-level">90%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="--skill-width: 90%"></div>
+                                    <div class="skill-bar-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="polaroid">
-                <div class="project-title">UPI Fraud Prediction System <span class="badge">Random Forest</span></div>
-                <div class="project-desc">XGBoost-based fraud classifier trained on transaction features; includes basic monitoring scripts. Features engineered from transaction history and real-time scoring pipeline included.</div>
+
+            <!-- Interactive Chart Section -->
+            <div class="skills-visualization">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Skills Overview
+                        </h3>
+                        <div class="chart-legend">
+                            <span class="legend-item">
+                                <span class="legend-dot primary"></span>
+                                Proficiency
+                            </span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div style="text-align:center; margin-top:2rem; padding:1.5rem 2rem; background:linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(58, 123, 213, 0.1) 100%); border-radius:16px; box-shadow:0 2px 12px rgba(0, 217, 255, 0.2); border:1px solid rgba(0, 217, 255, 0.3);">
-            <p style="font-size:1.2rem; color:#e8edf2; margin:0;">
-                💡 <strong>Want to see more?</strong> Check out my <a href="https://github.com/arpitjainnn14" target="_blank" rel="noopener" style="color:#00d9ff; text-decoration:none; font-weight:600; border-bottom:2px solid #00d9ff;">GitHub</a> for complete projects and notebooks!
-            </p>
         </div>
     </section>
-        <section class="contact section-fade" id="contact">
-            <div class="section-title">Say Hello 👋</div>
-            <form class="contact-form" action="https://getform.io/f/bllzmpkb" method="POST">
-                <input type="text" name="name" placeholder="Your Name" aria-label="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" aria-label="Your Email" required>
-                <textarea name="message" placeholder="Your Message" aria-label="Your Message" required></textarea>
-                <input type="hidden" name="_redirect" value="thank-you.html">
-                <button type="submit">Send Message</button>
-            </form>
-        </section>
-        <div class="footer" style="position:relative;">
-            <!-- Cute coffee cup with heart steam doodle -->
-            <svg id="footer-doodle" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute; left:10px; bottom:10px; opacity:0.7; cursor:pointer;">
-                <!-- Pie chart doodle -->
-                <circle cx="24" cy="24" r="18" stroke="#00d9ff" stroke-width="2" fill="none"/>
-                <path d="M24 24 L24 6 A18 18 0 0 1 36 12 Z" fill="rgba(0, 217, 255, 0.3)" stroke="#00d9ff" stroke-width="1"/>
-                <path d="M24 24 L36 12 A18 18 0 0 1 42 24 Z" fill="rgba(58, 123, 213, 0.3)" stroke="#3a7bd5" stroke-width="1"/>
-                <circle cx="24" cy="24" r="6" fill="rgba(0, 217, 255, 0.2)" stroke="#00d9ff" stroke-width="1"/>
-            </svg>
-            <div style="margin-bottom:0.5rem;">
-                <a href="https://github.com/arpitjainnn14" target="_blank" rel="noopener" style="margin:0 0.5rem;color:#3d405b;"><i class="fab fa-github"></i></a>
-                <a href="https://www.linkedin.com/in/arpitjain2004/" target="_blank" rel="noopener" style="margin:0 0.5rem;color:#3d405b;"><i class="fab fa-linkedin"></i></a>
-                <a href="https://www.kaggle.com/arpit14jain" target="_blank" rel="noopener" style="margin:0 0.5rem;color:#3d405b;"><i class="fas fa-chart-line"></i></a>
+
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title gradient-text">Featured Projects</h2>
+                <p class="section-subtitle">Building solutions that make a difference</p>
             </div>
-            <div style="text-align:center; color:#bcbcbc; font-size:0.95rem; margin-bottom:0.5rem;">
-                P.S. There’s more here than meets the eye.
+
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Diabetic Retinopathy Detection</h3>
+                        <p class="project-description">
+                            Deep learning model for early detection of diabetic retinopathy using fundus images. 
+                            Achieved 95% accuracy using CNN architecture with transfer learning.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">TensorFlow</span>
+                            <span class="tag">CNN</span>
+                            <span class="tag">Computer Vision</span>
+                            <span class="tag">Healthcare</span>
+                        </div>
+                        <div class="project-metrics">
+                            <div class="metric">
+                                <i class="fas fa-bullseye"></i>
+                                <span>95% Accuracy</span>
+                            </div>
+                            <div class="metric">
+                                <i class="fas fa-database"></i>
+                                <span>35K+ Images</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/arpitjainnn14" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                    <div class="project-overlay"></div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">TheraVox Voice Therapy</h3>
+                        <p class="project-description">
+                            AI-powered voice therapy application using speech recognition and NLP for 
+                            speech impediment correction. Real-time feedback and progress tracking.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">PyTorch</span>
+                            <span class="tag">NLP</span>
+                            <span class="tag">Speech Recognition</span>
+                            <span class="tag">Healthcare</span>
+                        </div>
+                        <div class="project-metrics">
+                            <div class="metric">
+                                <i class="fas fa-bullseye"></i>
+                                <span>92% Success Rate</span>
+                            </div>
+                            <div class="metric">
+                                <i class="fas fa-users"></i>
+                                <span>500+ Users</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/arpitjainnn14" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                    <div class="project-overlay"></div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card">
+                    <div class="project-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">UPI Fraud Detection</h3>
+                        <p class="project-description">
+                            Machine learning system for real-time UPI transaction fraud detection. 
+                            Ensemble model combining multiple algorithms for high accuracy.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">Scikit-learn</span>
+                            <span class="tag">XGBoost</span>
+                            <span class="tag">Fraud Detection</span>
+                            <span class="tag">FinTech</span>
+                        </div>
+                        <div class="project-metrics">
+                            <div class="metric">
+                                <i class="fas fa-bullseye"></i>
+                                <span>97% Precision</span>
+                            </div>
+                            <div class="metric">
+                                <i class="fas fa-database"></i>
+                                <span>1M+ Transactions</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/arpitjainnn14" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                    <div class="project-overlay"></div>
+                </div>
             </div>
-            &copy; 2025 Arpit Jain. Made with passion, curiosity, and a lot of coffee.
+
+            <!-- View All Projects Button -->
+            <div class="projects-footer">
+                <a href="https://github.com/arpitjainnn14" target="_blank" class="btn btn-primary">
+                    <i class="fab fa-github"></i> View All Projects on GitHub
+                </a>
+            </div>
         </div>
-    </div>
-    <!-- Easter Egg Modal/Toast -->
-    <div id="easter-egg-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
-        <div style="background:linear-gradient(135deg, #1a2942, #0f1e33); color:#e8edf2; border-radius:18px; padding:2rem 2.5rem; box-shadow:0 4px 32px rgba(0, 217, 255, 0.3); border:1px solid rgba(0, 217, 255, 0.3); font-size:1.3rem; text-align:center; position:relative;">
-            <span id="easter-egg-message"></span>
-            <button onclick="document.getElementById('easter-egg-modal').style.display='none'" style="position:absolute; top:10px; right:18px; background:none; border:none; font-size:1.5rem; color:#00d9ff; cursor:pointer;">&times;</button>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title gradient-text">Get In Touch</h2>
+                <p class="section-subtitle">Let's collaborate on your next data science project</p>
+            </div>
+
+            <div class="contact-grid">
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <h3 class="contact-title">Let's Connect</h3>
+                    <p class="contact-description">
+                        I'm always interested in hearing about new projects and opportunities. 
+                        Whether you have a question or just want to say hi, feel free to reach out!
+                    </p>
+
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="method-details">
+                                <h4>Email</h4>
+                                <a href="mailto:jainarpit2004@gmail.com">jainarpit2004@gmail.com</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                            <div class="method-details">
+                                <h4>LinkedIn</h4>
+                                <a href="https://linkedin.com/in/arpitjain2004/" target="_blank">Connect with me</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="method-details">
+                                <h4>GitHub</h4>
+                                <a href="https://github.com/arpitjainnn14" target="_blank">Check my repos</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                <i class="fab fa-kaggle"></i>
+                            </div>
+                            <div class="method-details">
+                                <h4>Kaggle</h4>
+                                <a href="https://kaggle.com/arpit14jain" target="_blank">View my notebooks</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Resume -->
+                    <div class="resume-download">
+                        <a href="Resume/ArpitJain_DataScientist_Resume.pdf" class="btn btn-secondary" download>
+                            <i class="fas fa-download"></i> Download Resume
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-wrapper">
+                    <form action="https://getform.io/f/bllzmpkb" method="POST" class="contact-form" id="contactForm">
+                        <input type="hidden" name="_redirect" value="thank-you.html">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
-    <div id="easter-egg-toast" role="status" aria-live="polite" style="display:none; position:fixed; bottom:40px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #00d9ff, #3a7bd5); color:#0a1628; padding:1rem 2rem; border-radius:12px; font-size:1.2rem; z-index:9999; box-shadow:0 4px 20px rgba(0, 217, 255, 0.4); font-weight:600;">
-        <span id="easter-egg-toast-message"></span>
-    </div>
-    <div id="easter-egg-hint-toast" style="display:none; position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #1a2942, #0f1e33); color:#e8edf2; padding:0.8rem 1.5rem; border-radius:12px; font-size:1.1rem; z-index:9999; box-shadow:0 4px 20px rgba(0, 217, 255, 0.3); border:1px solid rgba(0, 217, 255, 0.3);">
-        Tip: This site has hidden Easter eggs. Try keyboard shortcuts or clicking the pie chart!
-    </div>
-    <script>
-        // Section fade-in on scroll with rolling effect
-        function revealSections() {
-            document.querySelectorAll('.section-fade').forEach((section, idx) => {
-                const rect = section.getBoundingClientRect();
-                if (rect.top < window.innerHeight - 60) {
-                    setTimeout(() => {
-                        section.classList.add('visible');
-                        // Rocket launch animation when skills section is visible
-                        if (section.id === 'skills') {
-                            document.getElementById('rocket-doodle').classList.add('rocket-launch');
-                        }
-                    }, idx * 120); // Staggered reveal for rolling effect
-                }
-            });
-        }
-        window.addEventListener('scroll', revealSections);
-        window.addEventListener('DOMContentLoaded', () => {
-            revealSections();
-            // Hide scroll indicator after scroll
-            let scrolled = false;
-            window.addEventListener('scroll', function() {
-                if (!scrolled && window.scrollY > 40) {
-                    const arrow = document.querySelector('.scroll-indicator');
-                    if (arrow) arrow.style.display = 'none';
-                    scrolled = true;
-                }
-            });
-        });
-        // Konami code (robust, minimal test)
-        (function() {
-            const konamiKeys = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-            let konamiStep = 0;
-            document.addEventListener('keydown', function(e) {
-                // Ignore if typing in input or textarea
-                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-                if (key === konamiKeys[konamiStep]) {
-                    konamiStep++;
-                    if (konamiStep === konamiKeys.length) {
-                        showEasterEggToast('🎉 Konami Code Activated! Virtual high five ✋');
-                        konamiStep = 0;
-                    }
-                } else {
-                    konamiStep = 0;
-                }
-                // Silence debug logs for production
-            });
-        })();
-        // 2. Keyboard shortcut: 'C' for coffee
-        document.addEventListener('keydown', function(e) {
-            if (e.key.toLowerCase() === 'c' && !e.repeat) {
-                showEasterEggToast('☕ Coffee break! You deserve it.');
-            }
-        });
-        // 3. Click footer doodle for a dev joke
-        const jokes = [
-            "Why do programmers prefer dark mode? Because light attracts bugs!",
-            "A SQL query walks into a bar, walks up to two tables and asks: 'Can I join you?'",
-            "Why do Java developers wear glasses? Because they don't see sharp.",
-            "There are only 10 types of people in the world: those who understand binary and those who don't.",
-            "To understand recursion, you must first understand recursion."
-        ];
-        document.getElementById('footer-doodle').addEventListener('click', function() {
-            const joke = jokes[Math.floor(Math.random()*jokes.length)];
-            showEasterEggModal('😂 ' + joke);
-        });
-        // Modal and toast helpers
-        function showEasterEggModal(msg) {
-            document.getElementById('easter-egg-message').innerText = msg;
-            document.getElementById('easter-egg-modal').style.display = 'flex';
-        }
-        function showEasterEggToast(msg) {
-            const toast = document.getElementById('easter-egg-toast');
-            document.getElementById('easter-egg-toast-message').innerText = msg;
-            toast.style.display = 'block';
-            setTimeout(()=>{ toast.style.display = 'none'; }, 2200);
-        }
-        // Theme toggle minimal script
-        (function(){
-            const btn = document.getElementById('theme-toggle');
-            if (!btn) return;
-            const stored = localStorage.getItem('theme');
-            if (stored) document.body.setAttribute('data-theme', stored);
-            btn.addEventListener('click', function(){
-                const current = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.body.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-            });
-        })();
+    </section>
 
-        // Add music note easter egg
-        function playSound() {
-            const notes = ['🎵', '🎶', '♪', '♫'];
-            const note = document.createElement('div');
-            note.className = 'music-note';
-            note.textContent = notes[Math.floor(Math.random() * notes.length)];
-            note.style.left = Math.random() * window.innerWidth + 'px';
-            note.style.top = Math.random() * window.innerHeight + 'px';
-            document.body.appendChild(note);
-            
-            setTimeout(() => {
-                document.body.removeChild(note);
-            }, 3000);
-        }
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-glow"></div>
+        <div class="container">
+            <!-- Main Footer Content -->
+            <div class="footer-main">
+                <!-- Brand Section -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-bracket">&lt;</span>
+                        <span class="logo-text gradient-text">AJ</span>
+                        <span class="logo-bracket">/&gt;</span>
+                    </div>
+                    <p class="footer-tagline">
+                        Data Scientist & ML Engineer passionate about building intelligent systems 
+                        that solve real-world problems.
+                    </p>
+                    <div class="footer-stats-mini">
+                        <div class="stat-mini">
+                            <i class="fas fa-code"></i>
+                            <span>10+ Projects</span>
+                        </div>
+                        <div class="stat-mini">
+                            <i class="fas fa-brain"></i>
+                            <span>ML Expert</span>
+                        </div>
+                        <div class="stat-mini">
+                            <i class="fas fa-trophy"></i>
+                            <span>95% Success</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        // Add mouse trail effect
-        let mouseTrail = [];
-        document.addEventListener('mousemove', function(e) {
-            mouseTrail.push({x: e.clientX, y: e.clientY, time: Date.now()});
-            
-            // Clean old trail points
-            mouseTrail = mouseTrail.filter(point => Date.now() - point.time < 1000);
-            
-            // Create sparkle effect occasionally
-            if (Math.random() < 0.1) {
-                createSparkle(e.clientX, e.clientY);
-            }
-        });
+            <!-- Footer Divider -->
+            <div class="footer-divider">
+                <div class="divider-line"></div>
+                <div class="divider-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="divider-line"></div>
+            </div>
 
-        function createSparkle(x, y) {
-            const sparkle = document.createElement('div');
-            sparkle.style.position = 'fixed';
-            sparkle.style.left = x + 'px';
-            sparkle.style.top = y + 'px';
-            sparkle.style.width = '4px';
-            sparkle.style.height = '4px';
-            sparkle.style.background = '#e07a5f';
-            sparkle.style.borderRadius = '50%';
-            sparkle.style.pointerEvents = 'none';
-            sparkle.style.zIndex = '1000';
-            sparkle.style.animation = 'sparkle 1s ease-out forwards';
-            document.body.appendChild(sparkle);
-            
-            setTimeout(() => {
-                if (document.body.contains(sparkle)) {
-                    document.body.removeChild(sparkle);
-                }
-            }, 1000);
-        }
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p>
+                        <i class="far fa-copyright"></i> 2025 <span class="gradient-text">Arpit Jain</span>. 
+                        All rights reserved.
+                    </p>
+                </div>
+                <div class="footer-credits">
+                    <p>
+                        Crafted with <i class="fas fa-heart heartbeat"></i> and 
+                        <i class="fas fa-code"></i> • Powered by <span class="highlight">AI & Innovation</span>
+                    </p>
+                </div>
+                <div class="footer-back-top">
+                    <a href="#home" class="back-top-link">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Back to Top</span>
+                    </a>
+                </div>
+            </div>
+        </div>
 
-        // Add CSS for sparkle animation
-        const sparkleCSS = `
-            @keyframes sparkle {
-                0% { transform: scale(0) rotate(0deg); opacity: 1; }
-                50% { transform: scale(1) rotate(180deg); opacity: 0.8; }
-                100% { transform: scale(0) rotate(360deg); opacity: 0; }
-            }
-        `;
-        const sparkleStyle = document.createElement('style');
-        sparkleStyle.textContent = sparkleCSS;
-        document.head.appendChild(sparkleStyle);
+        <!-- Animated Background Elements -->
+        <div class="footer-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </footer>
 
-        // Add secret text selection easter egg
-        document.addEventListener('selectionchange', function() {
-            const selection = window.getSelection().toString().trim();
-            if (selection.toLowerCase().includes('data') && selection.length > 10) {
-                showEasterEggToast('📊 Data lover detected! Keep exploring!');
-            }
-        });
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
-        // Add clock in footer
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
-                hour12: true,
-                hour: 'numeric',
-                minute: '2-digit'
-            });
-            const clockElement = document.getElementById('live-clock');
-            if (clockElement) {
-                clockElement.textContent = `🕐 Currently ${timeString} in India 🇮🇳`;
-            }
-        }
-        
-        // Add live clock to footer
-        setTimeout(() => {
-            const footer = document.querySelector('.footer');
-            if (footer) {
-                const clock = document.createElement('div');
-                clock.id = 'live-clock';
-                clock.style.fontSize = '0.95rem';
-                clock.style.color = '#00d9ff';
-                clock.style.marginTop = '0.5rem';
-                clock.style.textShadow = '0 0 10px rgba(0, 217, 255, 0.5)';
-                clock.style.fontWeight = '500';
-                footer.insertBefore(clock, footer.lastElementChild);
-                updateClock();
-                setInterval(updateClock, 1000); // Update every second for real-time
-            }
-        }, 1000);
-
-        // Particle system (optimized for mobile)
-        function createParticles() {
-            const particles = document.getElementById('particles');
-            const isMobileDevice = window.innerWidth <= 768;
-            const maxParticles = isMobileDevice ? 5 : 15;
-            const interval = isMobileDevice ? 2000 : 1000;
-            
-            setInterval(() => {
-                if (document.querySelectorAll('.particle').length < maxParticles) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
-                    particle.style.opacity = Math.random() * 0.5 + 0.1;
-                    particles.appendChild(particle);
-                    
-                    setTimeout(() => {
-                        if (particles.contains(particle)) {
-                            particles.removeChild(particle);
-                        }
-                    }, 15000);
-                }
-            }, interval);
-        }
-        
-        // Skill bar animations
-        function animateSkills() {
-            const skillBars = document.querySelectorAll('.skill-progress');
-            skillBars.forEach(bar => {
-                const width = bar.getAttribute('data-width');
-                setTimeout(() => {
-                    bar.style.width = width + '%';
-                }, Math.random() * 1000 + 500);
-            });
-        }
-        
-        // FAB click handler
-        document.getElementById('fab').addEventListener('click', function() {
-            document.getElementById('fun-modal').style.display = 'flex';
-            playClickSound();
-        });
-        
-        // Fun modal functions
-        function closeFunModal() {
-            document.getElementById('fun-modal').style.display = 'none';
-        }
-        
-        function startConfetti() {
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.innerHTML = ['🎊', '🎉', '✨', '🌟'][Math.floor(Math.random() * 4)];
-                    confetti.style.position = 'fixed';
-                    confetti.style.left = Math.random() * window.innerWidth + 'px';
-                    confetti.style.top = '-50px';
-                    confetti.style.fontSize = '20px';
-                    confetti.style.pointerEvents = 'none';
-                    confetti.style.zIndex = '9999';
-                    confetti.style.animation = 'fall 3s linear forwards';
-                    document.body.appendChild(confetti);
-                    
-                    setTimeout(() => {
-                        if (document.body.contains(confetti)) {
-                            document.body.removeChild(confetti);
-                        }
-                    }, 3000);
-                }, i * 100);
-            }
-            closeFunModal();
-        }
-        
-        function startMatrix() {
-            const matrix = document.createElement('div');
-            matrix.style.position = 'fixed';
-            matrix.style.top = '0';
-            matrix.style.left = '0';
-            matrix.style.width = '100%';
-            matrix.style.height = '100%';
-            matrix.style.background = 'black';
-            matrix.style.color = '#0f0';
-            matrix.style.fontSize = '14px';
-            matrix.style.fontFamily = 'monospace';
-            matrix.style.zIndex = '99999';
-            matrix.style.overflow = 'hidden';
-            matrix.innerHTML = Array(50).fill(0).map(() => 
-                Array(Math.floor(window.innerWidth / 14)).fill(0).map(() => 
-                    String.fromCharCode(0x30A0 + Math.random() * 96)
-                ).join('')
-            ).join('<br>');
-            
-            document.body.appendChild(matrix);
-            
-            setTimeout(() => {
-                document.body.removeChild(matrix);
-            }, 3000);
-            
-            closeFunModal();
-        }
-        
-        function startRainbow() {
-            document.body.style.animation = 'rainbow 2s linear infinite';
-            setTimeout(() => {
-                document.body.style.animation = '';
-            }, 5000);
-            closeFunModal();
-        }
-        
-        // Sound effects (visual feedback)
-        function playClickSound() {
-            const soundWave = document.getElementById('sound-wave');
-            soundWave.style.display = 'inline-flex';
-            setTimeout(() => {
-                soundWave.style.display = 'none';
-            }, 1200);
-        }
-        
-        // Voice greeting on name click
-        document.querySelector('.handwritten').addEventListener('click', function() {
-            playClickSound();
-            showEasterEggToast('👋 Thanks for clicking! I love interactive visitors!');
-        });
-        
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
-        const mainNav = document.getElementById('main-nav');
-        const body = document.body;
-        
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function() {
-                mobileMenuBtn.classList.toggle('active');
-                mainNav.classList.toggle('active');
-                body.classList.toggle('menu-open');
-            });
-            
-            // Close menu when clicking nav links
-            mainNav.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function() {
-                    mobileMenuBtn.classList.remove('active');
-                    mainNav.classList.remove('active');
-                    body.classList.remove('menu-open');
-                });
-            });
-            
-            // Close menu when clicking overlay
-            document.addEventListener('click', function(e) {
-                if (body.classList.contains('menu-open') && 
-                    !mainNav.contains(e.target) && 
-                    !mobileMenuBtn.contains(e.target)) {
-                    mobileMenuBtn.classList.remove('active');
-                    mainNav.classList.remove('active');
-                    body.classList.remove('menu-open');
-                }
-            });
-        }
-        
-        // Detect mobile device for performance optimization
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-        
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', function() {
-            // ...existing code...
-            // Only create particles on desktop or reduce on mobile
-            if (!isMobile || window.innerWidth > 768) {
-                createParticles();
-            }
-            
-            // Animate skills when they come into view
-            const skillsSection = document.getElementById('skills');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        animateSkills();
-                        observer.unobserve(entry.target);
-                    }
-                });
-            });
-            observer.observe(skillsSection);
-        });
-        
-        // Add rainbow animation CSS
-        const rainbowCSS = `
-            @keyframes rainbow {
-                0% { filter: hue-rotate(0deg); }
-                100% { filter: hue-rotate(360deg); }
-            }
-            @keyframes fall {
-                to { transform: translateY(100vh) rotate(360deg); }
-            }
-        `;
-        const rainbowStyle = document.createElement('style');
-        rainbowStyle.textContent = rainbowCSS;
-        document.head.appendChild(rainbowStyle);
-        
-        // ...existing scripts...
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/modern.js"></script>
 </body>
 </html>
