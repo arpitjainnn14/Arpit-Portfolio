@@ -206,7 +206,4 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// Console easter egg
-console.log('%c🚀 Welcome to Arpit\'s Portfolio!', 'color: #6366f1; font-size: 20px; font-weight: bold;');
-console.log('%cLike what you see? Let\'s connect!', 'color: #8b5cf6; font-size: 14px;');
-console.log('%cGitHub: https://github.com/arpitjainnn14', 'color: #ec4899; font-size: 12px;');
+// Console logs removed as per request
