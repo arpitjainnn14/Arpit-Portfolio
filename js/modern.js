@@ -189,22 +189,41 @@ function initNavbar() {
 
 // ========== MOBILE MENU ========== //
 function initMobileMenu() {
-    const mobileToggle = document.querySelector('.mobile-menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
 
-    if (!mobileToggle) return;
+    if (!navToggle || !navMenu) return;
 
-    mobileToggle.addEventListener('click', () => {
-        mobileToggle.classList.toggle('active');
-        navLinks.classList.toggle('active');
+    navToggle.addEventListener('click', () => {
+        navToggle.classList.toggle('active');
+        navMenu.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (navMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
     });
 
     // Close menu when clicking a link
-    document.querySelectorAll('.nav-links a').forEach(link => {
+    document.querySelectorAll('.nav-menu .nav-link').forEach(link => {
         link.addEventListener('click', () => {
-            mobileToggle.classList.remove('active');
-            navLinks.classList.remove('active');
+            navToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = '';
         });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navMenu.classList.contains('active') && 
+            !navMenu.contains(e.target) && 
+            !navToggle.contains(e.target)) {
+            navToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     });
 }
 
@@ -461,7 +480,7 @@ if (contactForm) {
 }
 
 // ========== CURSOR TRAIL EFFECT (Desktop Only) ========== //
-if (window.innerWidth > 768) {
+if (window.innerWidth > 768 && !('ontouchstart' in window)) {
     const cursorTrail = [];
     const trailLength = 20;
 
@@ -546,25 +565,28 @@ if (window.innerWidth > 768) {
 
 // ========== PROJECT CARDS TILT EFFECT ========== //
 const projectCards = document.querySelectorAll('.project-card');
-projectCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+// Only enable tilt on non-touch devices
+if (!('ontouchstart' in window) && window.innerWidth > 768) {
+    projectCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
 
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
 
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
     });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-    });
-});
+}
 
 // ========== EASTER EGG - KONAMI CODE ========== //
 let konamiCode = [];

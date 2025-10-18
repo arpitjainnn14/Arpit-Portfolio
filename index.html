@@ -14,6 +14,27 @@
 
 </head>
 <body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition" id="pageTransition"></div>
+
+    <!-- Resume Viewer Modal -->
+    <div class="resume-modal" id="resumeModal">
+        <div class="resume-modal-content">
+            <div class="resume-header">
+                <h2>My Resume</h2>
+                <a href="Resume/ArpitJain_DataScientist_Resume.pdf" download class="resume-download-btn">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+                <button class="resume-close-btn" id="resumeCloseBtn" title="Close Resume">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="resume-viewer" id="resumeViewer">
+                <iframe src="Resume/ArpitJain_DataScientist_Resume.pdf" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Matrix Rain Background -->
     <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
     
@@ -32,6 +53,18 @@
                 <a href="#skills" class="nav-link">Skills</a>
                 <a href="#projects" class="nav-link">Projects</a>
                 <a href="#contact" class="nav-link">Contact</a>
+                <button class="nav-link resume-btn" id="resumeViewBtn" title="View Resume">
+                    <i class="fas fa-file-pdf"></i> Resume
+                </button>
+            </div>
+            <!-- Theme Switcher -->
+            <div class="theme-switcher" id="themeSwitcher">
+                <button class="theme-btn" data-theme="cyber" title="Cyber Theme">
+                    <i class="fas fa-bolt"></i>
+                </button>
+                <button class="theme-btn" data-theme="light" title="Light Theme">
+                    <i class="fas fa-sun"></i>
+                </button>
             </div>
             <div class="nav-toggle" id="navToggle">
                 <span></span>
@@ -669,13 +702,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Download Resume -->
-                    <div class="resume-download">
-                        <a href="Resume/ArpitJain_DataScientist_Resume.pdf" class="btn btn-secondary" download>
-                            <i class="fas fa-download"></i> Download Resume
-                        </a>
-                    </div>
                 </div>
 
                 <!-- Contact Form -->
@@ -793,7 +819,9 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script src="js/page-transitions.js"></script>
     <script src="js/modern.js"></script>
-    <script src="js/effects.js"></script>
+    <script src="js/wow-effects.js"></script>
 </body>
 </html>
