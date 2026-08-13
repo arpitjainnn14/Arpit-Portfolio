@@ -245,6 +245,15 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   scene.add(deskGlow)
   out.deskGlow = deskGlow
 
+  // A second, softer light set back toward the wall. The lamp was lighting the
+  // desktop but leaving the wall behind it flat — this paints the warm pool a
+  // real desk lamp throws up the wall. Dimmer and wider than the desk glow.
+  const wallWash = new T.PointLight(0xffb765, 26, 52, 2)
+  wallWash.position.set(-35, FL + 26, 1.5)
+  scene.add(wallWash)
+  out.wallWash = wallWash
+  out.wallWashFull = 26
+
   // ——— decoration ————————————————————————————————————————————
   // Non-interactive set dressing. Everything here is deliberately quiet: it
   // should read as a lived-in room in peripheral vision, never compete with the

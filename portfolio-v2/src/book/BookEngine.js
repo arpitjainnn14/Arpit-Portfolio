@@ -897,6 +897,10 @@ export default class BookEngine {
     this._room += (roomTarget - this._room) * Math.min(1, dt * 2.1)
     const room = this.reduced ? roomTarget : this._room
     if (this.deskGlow) this.deskGlow.intensity = 40 * Math.min(1, arrive * 1.4) * (0.25 + 0.75 * room)
+    if (this.wallWash) {
+      // Only worth paying for while the room is in view.
+      this.wallWash.intensity = this.wallWashFull * Math.min(1, arrive * 1.4) * room
+    }
 
     const dist =
       Math.max(needH / (2 * tanHalf), needW / (2 * tanHalf * aspect)) *
@@ -974,6 +978,7 @@ export default class BookEngine {
     if (this.lamp) this.lamp.intensity *= 0.14 + 0.86 * this._lit
     if (this.bulb) this.bulb.material.emissiveIntensity = 0.18 + 2.1 * this._lit
     if (this.deskGlow) this.deskGlow.intensity *= 0.08 + 0.92 * this._lit
+    if (this.wallWash) this.wallWash.intensity *= 0.06 + 0.94 * this._lit
 
     // ——— the mug: four sips, then an empty cup and a ring stain ———
     if (this.coffee) {
