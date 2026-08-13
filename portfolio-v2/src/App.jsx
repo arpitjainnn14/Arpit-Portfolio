@@ -1,122 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Suspense, lazy, useState } from 'react'
+import FlatBook from './flat/FlatBook'
 
-function App() {
-  const [count, setCount] = useState(0)
+// Three.js + html2canvas are ~900kB. Phones never render the 3D book, so they
+// should never pay to download it — hence the lazy import.
+const Book3D = lazy(() => import('./book/Book3D'))
 
+// The 3D book needs WebGL and a desk-sized window — the same thresholds the
+// design used. Everything else gets the flat edition, which is a real read
+// rather than a "come back on desktop" sign.
+function canRender3D() {
+  // ?view=flat / ?view=3d forces an edition — handy for checking the phone
+  // edition on a laptop, where you can't shrink the window far enough.
+  const forced = new URLSearchParams(window.location.search).get('view')
+  if (forced === 'flat') return false
+  if (forced === '3d') return true
+
+  const hasGL = (() => {
+    try {
+      const c = document.createElement('canvas')
+      return !!(c.getContext('webgl2') || c.getContext('webgl'))
+    } catch {
+      return false
+    }
+  })()
+  const tooSmall = window.innerWidth < 820 || window.innerHeight < 460
+  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+  return hasGL && !tooSmall && !coarse
+}
+
+// Shown while the book chunk downloads. Matches the loader inside Book3D so the
+// handover is invisible.
+function Binding() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div
+      style={{
+        position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 18, background: '#0f0c08',
+      }}
+    >
+      <div style={{ width: 26, height: 26, border: '1px solid rgba(203,160,102,.25)', borderTopColor: '#cba066', borderRadius: '50%', animation: 'spin 900ms linear infinite' }} />
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: '.28em', textTransform: 'uppercase', color: '#8d7b5d' }}>
+        binding the pages
+      </div>
+    </div>
   )
 }
 
-export default App
+export default function App() {
+  // Decided once at mount: swapping mid-session would tear down the WebGL scene.
+  const [use3D] = useState(canRender3D)
+  if (!use3D) return <FlatBook />
+  return (
+    <Suspense fallback={<Binding />}>
+      <Book3D />
+    </Suspense>
+  )
+}

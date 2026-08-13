@@ -1,33 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+html, body { margin: 0; padding: 0; background: #0f0c08; }
+* { box-sizing: border-box; }
+a { color: #a8551f; text-decoration: none; }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@keyframes hintPulse { 0%, 100% { opacity: .35; } 50% { opacity: .95; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Hover states for the nav pill. The engine writes `opacity` on the arrows and
+   `color` on the sound toggle inline, so the sound rule needs !important to win. */
+.book-btn:hover { color: #e8d3a8 !important; }
+.book-sound:hover { color: #cba066 !important; }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: #000;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #000;
-}
-::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 2px;
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }
