@@ -1,0 +1,17 @@
+CLAUDE.md
+.agents/
+.superpowers/
+skills-lock.json
+docs/
+
+# OS noise
+.DS_Store
+
+# Build output / deps (portfolio-v2 has its own, this covers the root)
+node_modules/
+dist/
+
+# Design source exported from claude.ai/design. Kept locally as the fidelity
+# reference for the 3D book — every animation constant in BookEngine.js comes
+# from it — but it is not part of the shipped site.
+Interactive Book Portfolio Design/
