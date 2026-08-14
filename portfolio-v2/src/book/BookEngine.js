@@ -598,17 +598,24 @@ export default class BookEngine {
     key.position.set(-9, 17, 10)
     key.castShadow = true
     // The frustum has to cover the whole study, or the room casts a hard black
-    // polygon on the back wall where the shadow map runs out.
-    key.shadow.mapSize.set(2048, 2048)
+    // polygon on the back wall where the shadow map runs out. But a frustum
+    // that wide spreads the map thin — at the desk close-up each texel was
+    // several screen pixels, which is what made the desk and chair look blocky.
+    // 4096 halves the texel size; the frustum is trimmed to what's actually lit.
+    key.shadow.mapSize.set(4096, 4096)
     key.shadow.radius = 8
-    key.shadow.camera.left = -60
-    key.shadow.camera.right = 60
-    key.shadow.camera.top = 60
-    key.shadow.camera.bottom = -60
+    key.shadow.camera.left = -48
+    key.shadow.camera.right = 48
+    key.shadow.camera.top = 52
+    key.shadow.camera.bottom = -48
     key.shadow.camera.near = 1
     key.shadow.camera.far = 200
     key.shadow.camera.updateProjectionMatrix()
-    key.shadow.bias = -0.0012
+    key.shadow.bias = -0.0006
+    // Offsets the sample along the surface normal — kills the self-shadowing
+    // stripes on the desktop and chair without the peter-panning a big
+    // negative bias causes.
+    key.shadow.normalBias = 0.06
     scene.add(key)
     const rim = new T.PointLight(0xc98b3f, 30, 60)
     rim.position.set(10, 6, -10)
@@ -903,6 +910,7 @@ export default class BookEngine {
     if (this._room === undefined) this._room = 1
     this._room += (roomTarget - this._room) * Math.min(1, dt * 2.1)
     const room = this.reduced ? roomTarget : this._room
+    this._roomLast = room // reused by the light block below
     if (this.deskGlow) this.deskGlow.intensity = 40 * Math.min(1, arrive * 1.4) * (0.25 + 0.75 * room)
     if (this.wallWash) {
       // Only worth paying for while the room is in view.
@@ -986,14 +994,25 @@ export default class BookEngine {
     if (this.bulb) this.bulb.material.emissiveIntensity = 0.18 + 2.1 * this._lit
     if (this.deskGlow) this.deskGlow.intensity *= 0.08 + 0.92 * this._lit
     if (this.wallWash) this.wallWash.intensity *= 0.06 + 0.94 * this._lit
+    if (this.lampSpot) this.lampSpot.intensity = this.lampSpotFull * this._lit * (this._roomLast || 0)
 
     // ——— the mug: four sips, then an empty cup and a ring stain ———
+    // The design snapped straight to each new level, which read as a glitch
+    // rather than a sip. Ease toward it instead, and fade the surface out at
+    // the end rather than switching `visible` mid-frame.
     if (this.coffee) {
       const s = this.sips || 0
-      this.coffee.position.y = this.coffeeTop - s * 0.44
-      this.coffee.visible = s < 4
-      if (this.crema) this.crema.material.opacity = 0.5 * (1 - s / 4)
-      if (this.stain) this.stain.material.opacity = s >= 4 ? 0.72 : 0
+      this._sip = this._sip === undefined ? s : this._sip + (s - this._sip) * Math.min(1, dt * 4)
+      const sip = this.reduced ? s : this._sip
+      this.coffee.position.y = this.coffeeTop - sip * 0.44
+      this.coffee.material.transparent = true
+      this.coffee.material.opacity = Math.max(0, Math.min(1, (3.9 - sip) / 0.6))
+      this.coffee.visible = this.coffee.material.opacity > 0.01
+      if (this.crema) this.crema.material.opacity = 0.5 * Math.max(0, 1 - sip / 4)
+      if (this.stain) {
+        const target = s >= 4 ? 0.72 : 0
+        this.stain.material.opacity += (target - this.stain.material.opacity) * Math.min(1, dt * 3)
+      }
     }
 
     // ——— the pen inking a signature across the desk book ———
@@ -1007,7 +1026,7 @@ export default class BookEngine {
 
     // ——— steam, thinning as the cup empties ———
     if (this.steam) {
-      const near = (0.35 + 0.65 * room) * (1 - (this.sips || 0) / 4)
+      const near = (0.35 + 0.65 * room) * Math.max(0, 1 - (this._sip || 0) / 4)
       for (const p of this.steam) {
         p.t += dt * 0.19
         if (p.t > 1) p.t -= 1

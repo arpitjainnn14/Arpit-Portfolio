@@ -60,6 +60,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   const seat = new T.Mesh(new T.BoxGeometry(8, 0.7, 8), deskMat)
   seat.position.set(0, FL + 6.2, 13)
   seat.castShadow = true
+  seat.receiveShadow = true
   desk.add(seat)
   ;[[-3.4, 9.8], [3.4, 9.8], [-3.4, 16.2], [3.4, 16.2]].forEach(([x, z]) => {
     const leg = new T.Mesh(new T.BoxGeometry(0.8, 6.2, 0.8), trim)
@@ -70,6 +71,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   const chairBack = new T.Mesh(new T.BoxGeometry(8, 8.4, 0.8), deskMat)
   chairBack.position.set(0, FL + 10.6, 16.6)
   chairBack.castShadow = true
+  chairBack.receiveShadow = true
   desk.add(chairBack)
   ;[-3.4, 3.4].forEach((x) => {
     const post = new T.Mesh(new T.BoxGeometry(0.8, 10.6, 0.8), trim)
@@ -83,13 +85,14 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
     new T.BoxGeometry(7, 0.5, 5),
     new T.MeshStandardMaterial({ color: 0xe4d7ba, roughness: 0.92 })
   )
-  openBook.position.set(-2, FL + 11.8, 0.5)
+  openBook.position.set(-3.0, FL + 11.8, 1.0)
   openBook.rotation.y = -0.2
   openBook.castShadow = true
+  openBook.receiveShadow = true
   desk.add(openBook)
 
   // ——— mug ————————————————————————————————————————————————————
-  const MUG_X = 5.4, MUG_Z = -1.2, MUG_BASE = FL + 11.55, MUG_H = 2.6
+  const MUG_X = -9.5, MUG_Z = -4.7, MUG_BASE = FL + 11.55, MUG_H = 2.6
   const ceramic = new T.MeshStandardMaterial({ color: 0xe6ddcc, roughness: 0.34, metalness: 0.04 })
   const ceramicIn = new T.MeshStandardMaterial({ color: 0xd8cdb8, roughness: 0.4, side: T.BackSide })
   const mug = new T.Group()
@@ -173,27 +176,74 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
     [clothMat, clothMat, coverMat, clothMat, clothMat, clothMat]
   )
   out.notebookMat = coverMat
-  notebook.position.set(-8.6, FL + 11.9, 2.4)
+  notebook.position.set(-9.8, FL + 11.9, 1.2)
   notebook.rotation.y = 0.22
   notebook.castShadow = true
+  notebook.receiveShadow = true
   desk.add(notebook)
 
-  const pen = new T.Mesh(
-    new T.CylinderGeometry(0.13, 0.13, 4.4, 10),
-    new T.MeshStandardMaterial({ color: 0x1d1a17, roughness: 0.4, metalness: 0.3 })
-  )
-  pen.position.set(-4.2, FL + 11.7, 4.4)
-  pen.rotation.set(Math.PI / 2, 0, 0.5)
-  pen.castShadow = true
+  // A fountain pen rather than a rod: barrel, cap band, tapered section, nib,
+  // and a clip. Parts run along the group's local Y so the group keeps the
+  // original lie-flat rotation.
+  const penBody = new T.MeshStandardMaterial({ color: 0x1d1a17, roughness: 0.34, metalness: 0.35 })
+  const penTrim = new T.MeshStandardMaterial({ color: 0xa8862f, roughness: 0.28, metalness: 0.85 })
+
+  const pen = new T.Group()
+  pen.position.set(-3.0, FL + 11.7, -4.6)
+  pen.rotation.set(Math.PI / 2, 0, Math.PI / 2 + 0.16)
+
+  const barrel = new T.Mesh(new T.CylinderGeometry(0.15, 0.145, 2.8, 16), penBody)
+  barrel.position.y = 0.8
+  barrel.castShadow = true
+  pen.add(barrel)
+
+  // rounded cap end
+  const capEnd = new T.Mesh(new T.SphereGeometry(0.15, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), penBody)
+  capEnd.position.y = 2.2
+  pen.add(capEnd)
+
+  // brass band where the cap meets the section
+  const band = new T.Mesh(new T.CylinderGeometry(0.157, 0.157, 0.16, 16), penTrim)
+  band.position.y = -0.62
+  pen.add(band)
+
+  // the section, tapering toward the nib
+  const section = new T.Mesh(new T.CylinderGeometry(0.14, 0.085, 1.0, 16), penBody)
+  section.position.y = -1.2
+  section.castShadow = true
+  pen.add(section)
+
+  // nib
+  const nib = new T.Mesh(new T.ConeGeometry(0.085, 0.5, 12), penTrim)
+  nib.position.y = -1.95
+  pen.add(nib)
+
+  // pocket clip
+  const clip = new T.Mesh(new T.BoxGeometry(0.05, 1.1, 0.11), penTrim)
+  clip.position.set(0.16, 1.6, 0)
+  clip.castShadow = true
+  pen.add(clip)
+
   desk.add(pen)
+
+  // An invisible proxy so the raycast (which is non-recursive) still has a
+  // single mesh to hit for the whole pen.
+  const penHit = new T.Mesh(
+    new T.CylinderGeometry(0.34, 0.34, 4.6, 8),
+    new T.MeshBasicMaterial({ visible: false })
+  )
+  penHit.position.copy(pen.position)
+  penHit.rotation.copy(pen.rotation)
+  desk.add(penHit)
 
   const papers = new T.Mesh(
     new T.BoxGeometry(6, 0.22, 8),
     new T.MeshStandardMaterial({ color: 0xe8dfc9, roughness: 0.92 })
   )
-  papers.position.set(3.4, FL + 11.66, 4.6)
+  papers.position.set(3.8, FL + 11.66, -1.0)
   papers.rotation.y = -0.14
   papers.castShadow = true
+  papers.receiveShadow = true
   desk.add(papers)
 
   // The top sheet of the stack, carrying the printed CV. A separate plane rather
@@ -204,7 +254,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   )
   cvSheet.rotation.x = -Math.PI / 2
   cvSheet.rotation.z = -0.14 // match the stack's angle on the desk
-  cvSheet.position.set(3.4, FL + 11.79, 4.6)
+  cvSheet.position.set(3.8, FL + 11.79, -1.0)
   cvSheet.receiveShadow = true
   desk.add(cvSheet)
   out.cvSheetMat = cvSheet.material
@@ -241,6 +291,24 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   )
   out.bulb.position.set(6.5, FL + 18.5, 3.7)
   desk.add(out.bulb)
+
+  // The lamp was emissive but cast nothing — objects on the desk sat in a lit
+  // pool with no shadows under them. A spotlight from the bulb, aimed down the
+  // desk, gives the mug, pen and notebook real shadows. A spotlight rather than
+  // a shadow-casting point light: one shadow map instead of a cube of six.
+  const lampSpot = new T.SpotLight(0xffc98a, 150, 46, 0.85, 0.65, 2)
+  lampSpot.position.set(6.5, FL + 18.3, 3.7)
+  lampSpot.castShadow = true
+  lampSpot.shadow.mapSize.set(1024, 1024)
+  lampSpot.shadow.camera.near = 1
+  lampSpot.shadow.camera.far = 40
+  lampSpot.shadow.bias = -0.0015
+  lampSpot.shadow.normalBias = 0.03
+  lampSpot.target.position.set(-1, FL + 11.5, 2)
+  desk.add(lampSpot)
+  desk.add(lampSpot.target)
+  out.lampSpot = lampSpot
+  out.lampSpotFull = 150
 
   scene.add(desk)
   out.desk = desk
@@ -357,7 +425,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
     new T.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
   )
   signPlane.rotation.x = -Math.PI / 2
-  signPlane.position.set(-2, FL + 12.1, 0.5)
+  signPlane.position.set(-3.0, FL + 12.1, 1.0)
   signPlane.rotation.z = -0.2
   desk.add(signPlane)
   out.signCanvas = document.createElement('canvas')
@@ -380,7 +448,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
     { kind: 'note', hit: notebook, tint: [clothMat, coverMat] },
     { kind: 'lamp', hit: shade, tint: [shadeMat] },
     { kind: 'mug', hit: shell, tint: [ceramic] },
-    { kind: 'pen', hit: pen, tint: [pen.material] },
+    { kind: 'pen', hit: penHit, tint: [penBody, penTrim] },
   ]
   out.deskTargets.forEach((t) => { t.hit.userData.deskKind = t.kind })
   out.deskHits = out.deskTargets.map((t) => t.hit)
