@@ -51,20 +51,22 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   desk.add(dTop)
   ;[[-11.5, -5], [11.5, -5], [-11.5, 5], [11.5, 5]].forEach(([x, z]) => {
     const leg = new T.Mesh(new T.BoxGeometry(1.1, 11, 1.1), trim)
-    leg.position.set(x, FL + 5.5, z)
+    leg.position.set(x, FL + 5.52, z)
     leg.castShadow = true
     desk.add(leg)
   })
 
   // chair
-  const seat = new T.Mesh(new T.BoxGeometry(8, 0.7, 8), deskMat)
-  seat.position.set(0, FL + 6.2, 13)
+  // Slightly narrower and shorter than the backrest so their sides and back
+  // don't share a plane — same z-fighting cause as the posts.
+  const seat = new T.Mesh(new T.BoxGeometry(7.8, 0.7, 8), deskMat)
+  seat.position.set(0, FL + 6.2, 12.9)
   seat.castShadow = true
   seat.receiveShadow = true
   desk.add(seat)
   ;[[-3.4, 9.8], [3.4, 9.8], [-3.4, 16.2], [3.4, 16.2]].forEach(([x, z]) => {
     const leg = new T.Mesh(new T.BoxGeometry(0.8, 6.2, 0.8), trim)
-    leg.position.set(x, FL + 3.1, z)
+    leg.position.set(x, FL + 3.12, z)
     leg.castShadow = true
     desk.add(leg)
   })
@@ -73,9 +75,13 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   chairBack.castShadow = true
   chairBack.receiveShadow = true
   desk.add(chairBack)
+  // The back posts were modelled at exactly the backrest's depth AND exactly
+  // the rear legs' width, so those surfaces were coincident and the depth test
+  // flickered between them — the hatched stripe down the chair. Slimmer and
+  // shifted back by a fraction, they share no plane with anything.
   ;[-3.4, 3.4].forEach((x) => {
-    const post = new T.Mesh(new T.BoxGeometry(0.8, 10.6, 0.8), trim)
-    post.position.set(x, FL + 5.3, 16.6)
+    const post = new T.Mesh(new T.BoxGeometry(0.7, 10.6, 0.7), trim)
+    post.position.set(x, FL + 5.35, 16.75)
     post.castShadow = true
     desk.add(post)
   })
@@ -97,8 +103,39 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   const ceramicIn = new T.MeshStandardMaterial({ color: 0xd8cdb8, roughness: 0.4, side: T.BackSide })
   const mug = new T.Group()
   mug.position.set(MUG_X, MUG_BASE, MUG_Z)
+  // A cylinder's UV starts at +z, so the mark drawn at u=0.5 lands on the far
+  // side. Turning the mug brings it to face the room; the handle comes round to
+  // the other side and stays in view.
+  mug.rotation.y = Math.PI
 
-  const shell = new T.Mesh(new T.CylinderGeometry(1.12, 0.96, MUG_H, 30, 1, true), ceramic)
+  // A stamped monogram, the way a ceramic mug carries a maker's mark. Drawn to
+  // a canvas rather than DOM: the cylinder's UV wraps u once around, so placing
+  // the mark at u≈0.5 puts it on one side only.
+  const mugArt = document.createElement('canvas')
+  mugArt.width = 1024
+  mugArt.height = 512
+  {
+    const g = mugArt.getContext('2d')
+    g.fillStyle = '#e6ddcc'
+    g.fillRect(0, 0, 1024, 512)
+    const cx = 512, cy = 250
+    g.strokeStyle = 'rgba(143,99,32,.55)'
+    g.lineWidth = 5
+    g.beginPath()
+    g.arc(cx, cy, 104, 0, Math.PI * 2)
+    g.stroke()
+    g.fillStyle = '#8f6320'
+    g.textAlign = 'center'
+    g.textBaseline = 'middle'
+    g.font = '500 84px "IBM Plex Mono", monospace'
+    g.fillText('AJ', cx, cy - 12)
+    g.font = '500 26px "IBM Plex Mono", monospace'
+    g.fillText('EST. 2026', cx, cy + 58)
+  }
+  const ceramicPrinted = new T.MeshStandardMaterial({
+    map: tex(mugArt), roughness: 0.34, metalness: 0.04,
+  })
+  const shell = new T.Mesh(new T.CylinderGeometry(1.12, 0.96, MUG_H, 30, 1, true), ceramicPrinted)
   shell.position.y = MUG_H / 2
   shell.castShadow = true
   mug.add(shell)
@@ -128,9 +165,14 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   crema.rotation.x = -Math.PI / 2
   crema.position.y = MUG_H - 0.41
   mug.add(crema)
-  const handle = new T.Mesh(new T.TorusGeometry(0.62, 0.15, 10, 24, Math.PI * 1.35), ceramic)
-  handle.position.set(1.06, MUG_H * 0.56, 0)
-  handle.rotation.set(0, Math.PI / 2, -0.35)
+  // The design rotated the handle onto the Y-Z plane, so its loop stuck out
+  // sideways past the mug instead of away from it — it read as a flat tab.
+  // A torus in its default X-Y plane, spun so the arc's gap faces the mug,
+  // gives an actual loop you could put a finger through.
+  const HANDLE_ARC = Math.PI * 1.35
+  const handle = new T.Mesh(new T.TorusGeometry(0.62, 0.14, 12, 28, HANDLE_ARC), ceramic)
+  handle.position.set(1.3, MUG_H * 0.52, 0)
+  handle.rotation.set(0, 0, -HANDLE_ARC / 2) // centre the arc on +x
   handle.castShadow = true
   mug.add(handle)
   const saucer = new T.Mesh(new T.CylinderGeometry(1.7, 1.55, 0.12, 30), ceramic)
@@ -189,8 +231,11 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   const penTrim = new T.MeshStandardMaterial({ color: 0xa8862f, roughness: 0.28, metalness: 0.85 })
 
   const pen = new T.Group()
-  pen.position.set(-3.0, FL + 11.7, -4.6)
-  pen.rotation.set(Math.PI / 2, 0, Math.PI / 2 + 0.16)
+  // Laid across the top of the open book, just above where the signature is
+  // inked — as if it were put down mid-thought. Sitting on the book (rather
+  // than half off it) keeps it supported so no end floats over the desk.
+  pen.position.set(-3.0, FL + 12.28, -0.6)
+  pen.rotation.set(Math.PI / 2, 0, Math.PI / 2 + 0.1)
 
   const barrel = new T.Mesh(new T.CylinderGeometry(0.15, 0.145, 2.8, 16), penBody)
   barrel.position.y = 0.8
@@ -332,23 +377,78 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   // should read as a lived-in room in peripheral vision, never compete with the
   // book for attention.
 
-  // a framed print on the back wall, beside the bookcase
+  // a framed print on the back wall, beside the bookcase — a moonlit ridge
+  // line, drawn on a canvas so it shares the window's dusk palette rather than
+  // sitting there as a flat coloured rectangle.
+  const art = new T.Group()
+  art.position.set(25, FL + 34, -6.3)
+  art.rotation.z = 0.012 // hung by hand, not by CAD
+  scene.add(art)
+
   const frame = new T.Mesh(new T.BoxGeometry(10, 13, 0.5), trim)
-  frame.position.set(25, FL + 34, -6.3)
   frame.castShadow = true
-  scene.add(frame)
+  art.add(frame)
+  // an inner lip, inset and pushed forward, so the moulding reads as bevelled
+  // instead of one flat slab
+  const lip = new T.Mesh(
+    new T.BoxGeometry(9.1, 12.1, 0.3),
+    new T.MeshStandardMaterial({ color: 0x3a2617, roughness: 0.7 })
+  )
+  lip.position.z = 0.16
+  art.add(lip)
+
   const mount = new T.Mesh(
     new T.PlaneGeometry(8.4, 11.4),
     new T.MeshStandardMaterial({ color: 0xd8cbae, roughness: 0.95 })
   )
-  mount.position.set(25, FL + 34, -6.03)
-  scene.add(mount)
-  const plate = new T.Mesh(
-    new T.PlaneGeometry(6.2, 8.2),
-    new T.MeshStandardMaterial({ color: 0x3b4a3f, roughness: 0.9 })
+  mount.position.z = 0.27
+  art.add(mount)
+
+  // gallery margins: even on the sides and top, deeper along the bottom
+  const printW = 6.4
+  const printH = 8.0
+  const printC = document.createElement('canvas')
+  printC.width = 512
+  printC.height = Math.round((512 * printH) / printW)
+  drawMoonlitPrint(printC)
+  // This wall gets almost no light, so a plain lit material crushed the print to
+  // black. Feeding the same canvas back as a low emissive map lets the picture
+  // hold its own values without reading as a glowing screen.
+  const printTex = tex(printC)
+  const print = new T.Mesh(
+    new T.PlaneGeometry(printW, printH),
+    new T.MeshStandardMaterial({
+      map: printTex,
+      emissive: 0xffffff,
+      emissiveMap: printTex,
+      emissiveIntensity: 0.5,
+      roughness: 0.92,
+    })
   )
-  plate.position.set(25, FL + 34.6, -6.01)
-  scene.add(plate)
+  print.position.set(0, 0.75, 0.29)
+  art.add(print)
+
+  // glass: a single diagonal highlight, faint enough that it only registers as
+  // the camera swings past
+  const glassC = document.createElement('canvas')
+  glassC.width = glassC.height = 128
+  const gctx = glassC.getContext('2d')
+  const ggrad = gctx.createLinearGradient(0, 128, 128, 0)
+  ggrad.addColorStop(0, 'rgba(255,255,255,0)')
+  ggrad.addColorStop(0.42, 'rgba(255,255,255,0)')
+  ggrad.addColorStop(0.55, 'rgba(255,255,255,0.5)')
+  ggrad.addColorStop(0.68, 'rgba(255,255,255,0)')
+  ggrad.addColorStop(1, 'rgba(255,255,255,0)')
+  gctx.fillStyle = ggrad
+  gctx.fillRect(0, 0, 128, 128)
+  const glass = new T.Mesh(
+    new T.PlaneGeometry(8.4, 11.4),
+    new T.MeshBasicMaterial({
+      map: tex(glassC), transparent: true, opacity: 0.07, depthWrite: false,
+    })
+  )
+  glass.position.z = 0.31
+  art.add(glass)
 
   // a plant in the corner, leaves as a few tilted cones
   const pot = new T.Mesh(
@@ -447,11 +547,111 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
     { kind: 'cv', hit: papers, tint: [papers.material, cvSheet.material] },
     { kind: 'note', hit: notebook, tint: [clothMat, coverMat] },
     { kind: 'lamp', hit: shade, tint: [shadeMat] },
-    { kind: 'mug', hit: shell, tint: [ceramic] },
+    { kind: 'mug', hit: shell, tint: [ceramic, ceramicPrinted] },
     { kind: 'pen', hit: penHit, tint: [penBody, penTrim] },
   ]
   out.deskTargets.forEach((t) => { t.hit.userData.deskKind = t.kind })
   out.deskHits = out.deskTargets.map((t) => t.hit)
 
   return out
+}
+
+// The art inside the frame: three ridges under a moon, in the same dusk blues
+// as the window on the far wall so the print looks chosen for the room. Drawn
+// deterministically — the same picture every load, no seeded-random surprises.
+function drawMoonlitPrint(canvas) {
+  const W = canvas.width
+  const H = canvas.height
+  const c = canvas.getContext('2d')
+
+  // sky: pale cream at the horizon climbing into the window's dusty blue. The
+  // warm band sits high enough to show through the gaps between the ridges —
+  // pushed to the very bottom it was covered by them and the print read all-blue.
+  const sky = c.createLinearGradient(0, 0, 0, H)
+  sky.addColorStop(0, '#1b2739')
+  sky.addColorStop(0.3, '#3b5070')
+  sky.addColorStop(0.52, '#6d82a0')
+  sky.addColorStop(0.64, '#b9a98e')
+  sky.addColorStop(0.74, '#e0cfae')
+  sky.addColorStop(1, '#e8d9ba')
+  c.fillStyle = sky
+  c.fillRect(0, 0, W, H)
+
+  // stars, weighted toward the top where the sky is darkest
+  const stars = [
+    [0.12, 0.08], [0.28, 0.05], [0.41, 0.14], [0.55, 0.07], [0.83, 0.11],
+    [0.19, 0.21], [0.36, 0.27], [0.62, 0.19], [0.9, 0.24], [0.07, 0.33],
+    [0.48, 0.35], [0.75, 0.31],
+  ]
+  stars.forEach(([sx, sy], i) => {
+    c.fillStyle = `rgba(255,248,232,${0.5 - sy * 0.9})`
+    c.beginPath()
+    c.arc(sx * W, sy * H, i % 3 === 0 ? 1.8 : 1.1, 0, 6.283)
+    c.fill()
+  })
+
+  // the moon, up and to the right, with a soft halo
+  const mx = W * 0.7
+  const my = H * 0.2
+  const halo = c.createRadialGradient(mx, my, 0, mx, my, W * 0.3)
+  halo.addColorStop(0, 'rgba(255,247,225,0.55)')
+  halo.addColorStop(0.35, 'rgba(255,247,225,0.12)')
+  halo.addColorStop(1, 'rgba(255,247,225,0)')
+  c.fillStyle = halo
+  c.fillRect(0, 0, W, H)
+  c.fillStyle = '#fdf6e2'
+  c.beginPath()
+  c.arc(mx, my, W * 0.075, 0, 6.283)
+  c.fill()
+
+  // Three ridges, each darker and lower than the one behind it. Every ridge gets
+  // its own control points — driving all three off one shared profile made them
+  // rhyme, which read as a stack of identical waves rather than a landscape.
+  const ridge = (color, startY, segs) => {
+    c.fillStyle = color
+    c.beginPath()
+    c.moveTo(0, startY * H)
+    segs.forEach(([cx, cy, ex, ey]) => c.quadraticCurveTo(cx * W, cy * H, ex * W, ey * H))
+    c.lineTo(W, H)
+    c.lineTo(0, H)
+    c.closePath()
+    c.fill()
+  }
+  // far: one tall peak left of centre, trailing off right
+  ridge('#8b9cb0', 0.68, [
+    [0.14, 0.60, 0.30, 0.545],
+    [0.42, 0.465, 0.52, 0.61],
+    [0.66, 0.72, 0.80, 0.655],
+    [0.92, 0.615, 1.0, 0.665],
+  ])
+  // mid: low on the left, its shoulder rising past the far peak on the right
+  ridge('#3d4f63', 0.8, [
+    [0.1, 0.785, 0.24, 0.805],
+    [0.4, 0.835, 0.56, 0.7],
+    [0.72, 0.6, 0.84, 0.745],
+    [0.95, 0.835, 1.0, 0.79],
+  ])
+  // near: a long shallow swell, the darkest and least detailed
+  ridge('#10161f', 0.92, [
+    [0.16, 0.86, 0.34, 0.9],
+    [0.52, 0.95, 0.7, 0.88],
+    [0.88, 0.83, 1.0, 0.885],
+  ])
+
+  // paper grain — a few horizontal streaks so the flat fills don't read as
+  // vector clip-art under the lamp
+  c.globalAlpha = 0.05
+  for (let i = 0; i < 90; i++) {
+    const y = (i * 37.7) % H
+    c.fillStyle = i % 2 ? '#000' : '#fff'
+    c.fillRect(0, y, W, 1)
+  }
+  c.globalAlpha = 1
+
+  // vignette
+  const vig = c.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.72)
+  vig.addColorStop(0, 'rgba(0,0,0,0)')
+  vig.addColorStop(1, 'rgba(0,0,0,0.28)')
+  c.fillStyle = vig
+  c.fillRect(0, 0, W, H)
 }
