@@ -381,32 +381,40 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   // line, drawn on a canvas so it shares the window's dusk palette rather than
   // sitting there as a flat coloured rectangle.
   const art = new T.Group()
-  art.position.set(25, FL + 34, -6.3)
+  art.position.set(25, FL + 35, -6.3)
   art.rotation.z = 0.012 // hung by hand, not by CAD
   scene.add(art)
 
-  const frame = new T.Mesh(new T.BoxGeometry(10, 13, 0.5), trim)
+  const frame = new T.Mesh(new T.BoxGeometry(12, 15.5, 0.5), trim)
   frame.castShadow = true
   art.add(frame)
-  // an inner lip, inset and pushed forward, so the moulding reads as bevelled
-  // instead of one flat slab
-  const lip = new T.Mesh(
-    new T.BoxGeometry(9.1, 12.1, 0.3),
-    new T.MeshStandardMaterial({ color: 0x3a2617, roughness: 0.7 })
-  )
-  lip.position.z = 0.16
-  art.add(lip)
+  // An inner lip standing proud of the frame face, so the moulding reads as
+  // bevelled instead of one flat slab. It has to be four bars rather than one
+  // inset box: a box spans the whole opening, and since it sits forward of the
+  // frame face it would cover the mount and the print entirely.
+  const lipMat = new T.MeshStandardMaterial({ color: 0x3a2617, roughness: 0.7 })
+  ;[[11.3, 0.85, 0, 7.0], [11.3, 0.85, 0, -7.0], [0.85, 14.9, -5.2, 0], [0.85, 14.9, 5.2, 0]]
+    .forEach(([w, h, x, y]) => {
+      const bar = new T.Mesh(new T.BoxGeometry(w, h, 0.4), lipMat)
+      bar.position.set(x, y, 0.25)
+      bar.castShadow = true
+      art.add(bar)
+    })
 
+  // Everything from here forward sits ahead of the frame's front face (z 0.25)
+  // and inside the lip's 9.6 × 13.2 opening, spaced far enough apart not to
+  // z-fight at this camera distance. The mount overshoots the opening so its
+  // edges tuck under the lip.
   const mount = new T.Mesh(
-    new T.PlaneGeometry(8.4, 11.4),
-    new T.MeshStandardMaterial({ color: 0xd8cbae, roughness: 0.95 })
+    new T.PlaneGeometry(10.1, 13.7),
+    new T.MeshStandardMaterial({ color: 0xb9ab8c, roughness: 0.95 })
   )
-  mount.position.z = 0.27
+  mount.position.z = 0.3
   art.add(mount)
 
   // gallery margins: even on the sides and top, deeper along the bottom
-  const printW = 6.4
-  const printH = 8.0
+  const printW = 7.7
+  const printH = 9.6
   const printC = document.createElement('canvas')
   printC.width = 512
   printC.height = Math.round((512 * printH) / printW)
@@ -421,11 +429,11 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
       map: printTex,
       emissive: 0xffffff,
       emissiveMap: printTex,
-      emissiveIntensity: 0.5,
+      emissiveIntensity: 0.3,
       roughness: 0.92,
     })
   )
-  print.position.set(0, 0.75, 0.29)
+  print.position.set(0, 0.9, 0.36)
   art.add(print)
 
   // glass: a single diagonal highlight, faint enough that it only registers as
@@ -442,12 +450,12 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   gctx.fillStyle = ggrad
   gctx.fillRect(0, 0, 128, 128)
   const glass = new T.Mesh(
-    new T.PlaneGeometry(8.4, 11.4),
+    new T.PlaneGeometry(10.1, 13.7),
     new T.MeshBasicMaterial({
       map: tex(glassC), transparent: true, opacity: 0.07, depthWrite: false,
     })
   )
-  glass.position.z = 0.31
+  glass.position.z = 0.42
   art.add(glass)
 
   // a plant in the corner, leaves as a few tilted cones
