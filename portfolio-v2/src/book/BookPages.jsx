@@ -3,6 +3,7 @@ import {
 } from '../data/book'
 import ArchitectureFigure from './ArchitectureFigure'
 import CVSheet from './CVSheet'
+import NotebookCover from './NotebookCover'
 
 // The eleven 700x900 faces of the book. They live offscreen at left:-20000px
 // and exist only so html2canvas can rasterise them into page textures.
@@ -250,8 +251,9 @@ export default function BookPages({ innerRef }) {
         <div style={{ fontFamily: MONO, fontWeight: 500, fontSize: 14, letterSpacing: '.34em', textTransform: 'uppercase', color: '#93794f' }}>{backCover}</div>
       </div>
 
-      {/* Not a book face — rasterised onto the loose papers on the desk. */}
+      {/* Not book faces — rasterised onto objects on the desk. */}
       <CVSheet />
+      <NotebookCover />
     </div>
   )
 }

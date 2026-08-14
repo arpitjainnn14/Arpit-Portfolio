@@ -145,6 +145,25 @@ export const contact = {
   footer: 'the end · scroll back any time',
 }
 
+// The notebook on the desk. Clicking it opens a ruled page you can write on.
+export const note = {
+  eyebrow: 'the notebook',
+  heading: 'Leave a note.',
+  blurb: "Anything at all — a role, a question, or a correction to something on these pages.",
+  fields: {
+    name: { label: 'who', placeholder: 'your name' },
+    email: { label: 'reply to', placeholder: 'where I can write back' },
+    message: { label: 'the note', placeholder: '…' },
+  },
+  submit: 'leave it',
+  sending: 'writing…',
+  done: 'left on the desk · I\'ll find it',
+  // Deliberately honest: a portfolio that silently swallows a message is worse
+  // than one with no form at all.
+  failed: "That didn't send. Write to me directly instead:",
+  endpoint: 'https://getform.io/f/bllzmpkb',
+}
+
 export const backCover = 'arpit jain · 2026'
 
 // Spine titles printed on the named books sharing the shelf.

@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  meta, cover, about, work, toolkit, method, experience, education, contact, backCover,
+  meta, cover, about, work, toolkit, method, experience, education, contact, note, backCover,
 } from '../data/book'
+import useNoteSubmit from '../lib/useNoteSubmit'
 
 // The edition for phones and machines without WebGL. Same words as the 3D book,
 // read the way a book actually reads on a small screen: top to bottom.
@@ -30,6 +31,81 @@ function Folio({ n, of }) {
     <div style={{ ...smallMono, letterSpacing: '.2em', color: '#b0a184', textAlign: 'center', paddingTop: 12 }}>
       {String(n).padStart(2, '0')} / {String(of).padStart(2, '0')}
     </div>
+  )
+}
+
+// The phone edition's version of the notebook: same fields, same endpoint,
+// laid out inline instead of behind a desk object there is no room for.
+function NoteForm() {
+  const { status, submit } = useNoteSubmit()
+  const [fields, setFields] = useState({ name: '', email: '', message: '', website: '' })
+  const email = contact.links.find((l) => l.label === 'email')
+  const set = (k) => (e) => setFields((f) => ({ ...f, [k]: e.target.value }))
+  const ready = fields.message.trim() && fields.email.trim() && status !== 'sending'
+
+  const input = {
+    width: '100%', border: 'none', outline: 'none', background: 'transparent',
+    fontFamily: SERIF, fontSize: 17, color: '#241c11', padding: '7px 0',
+    borderBottom: '1px solid rgba(140,112,66,.32)',
+  }
+
+  if (status === 'done') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 20, borderTop: '1px solid rgba(140,116,78,.32)' }}>
+        <div style={chapter}>{note.eyebrow}</div>
+        <div style={{ fontSize: 26, color: '#241c11', lineHeight: 1.2 }}>Thank you.</div>
+        <div style={smallMono}>{note.done}</div>
+      </div>
+    )
+  }
+
+  return (
+    <form
+      onSubmit={(e) => { e.preventDefault(); if (ready) submit(fields) }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 20, borderTop: '1px solid rgba(140,116,78,.32)' }}
+    >
+      <div style={chapter}>{note.eyebrow}</div>
+      <div style={{ fontSize: 26, color: '#241c11', lineHeight: 1.2 }}>{note.heading}</div>
+
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ ...smallMono, fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase' }}>{note.fields.name.label}</span>
+        <input style={input} value={fields.name} onChange={set('name')} placeholder={note.fields.name.placeholder} autoComplete="name" />
+      </label>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ ...smallMono, fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase' }}>{note.fields.email.label}</span>
+        <input style={input} type="email" required value={fields.email} onChange={set('email')} placeholder={note.fields.email.placeholder} autoComplete="email" />
+      </label>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ ...smallMono, fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase' }}>{note.fields.message.label}</span>
+        <textarea style={{ ...input, minHeight: 96, resize: 'vertical', lineHeight: 1.6 }} required value={fields.message} onChange={set('message')} placeholder={note.fields.message.placeholder} />
+      </label>
+
+      {/* honeypot */}
+      <input
+        tabIndex={-1} aria-hidden="true" autoComplete="off"
+        value={fields.website} onChange={set('website')}
+        style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
+      />
+
+      {status === 'failed' ? (
+        <div style={{ fontSize: 15, lineHeight: 1.5, color: '#8a4a16' }}>
+          {note.failed} <a href={email ? email.href : '#'} style={{ color: '#8a4a16', textDecoration: 'underline' }}>{email ? email.text : ''}</a>
+        </div>
+      ) : null}
+
+      <button
+        type="submit"
+        disabled={!ready}
+        style={{
+          alignSelf: 'flex-start', fontFamily: MONO, fontSize: 11, letterSpacing: '.2em',
+          textTransform: 'uppercase', color: '#14100a', background: '#cba066',
+          padding: '13px 24px', border: 'none', borderRadius: 999,
+          opacity: ready ? 1 : 0.45,
+        }}
+      >
+        {status === 'sending' ? note.sending : note.submit}
+      </button>
+    </form>
   )
 }
 
@@ -196,6 +272,7 @@ export default function FlatBook() {
             </div>
           ))}
         </div>
+        <NoteForm />
         <div style={{ ...smallMono, color: '#5a4413', marginTop: 10 }}>{contact.footer}</div>
         <Folio n={8} of={of} />
       </section>

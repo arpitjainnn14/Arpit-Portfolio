@@ -111,7 +111,7 @@ export default class BookEngine {
   // Page-turn input is ignored while a desk interaction owns the screen —
   // otherwise scrolling the CV panel flips pages behind it.
   get inputBusy() {
-    return this.deskFocus || !!(this.hooks.isCVOpen && this.hooks.isCVOpen())
+    return this.deskFocus || !!(this.hooks.isPanelOpen && this.hooks.isPanelOpen())
   }
 
   bindUI() {
@@ -155,8 +155,8 @@ export default class BookEngine {
     // Escape walks back out: CV panel → desk close-up → book → shelf → room.
     this.on(window, 'keydown', (e) => {
       if (e.key !== 'Escape') return
-      if (this.hooks.isCVOpen && this.hooks.isCVOpen()) {
-        if (this.hooks.onCV) this.hooks.onCV(false)
+      if (this.hooks.isPanelOpen && this.hooks.isPanelOpen()) {
+        if (this.hooks.onPanel) this.hooks.onPanel(null)
         return
       }
       if (this.deskFocus) {
@@ -340,7 +340,7 @@ export default class BookEngine {
       this.pending = []
       for (let i = 0; i < faces.length; i++) if (first.indexOf(i) === -1) this.pending.push(i)
       this.pump()
-      this.paintCVSheet(opts)
+      this.paintDeskSurfaces(opts)
 
       if (this.loader) {
         this.loader.style.opacity = '0'
@@ -402,18 +402,24 @@ export default class BookEngine {
     })
   }
 
-  // Print the CV onto the loose papers on the desk. Fire-and-forget: it's a
-  // background detail, so it must never hold up the book.
-  async paintCVSheet(opts) {
-    const el = this.pages && this.pages.querySelector('[data-cvsheet]')
-    if (!el || !this.cvSheetMat) return
-    try {
-      const canvas = await html2canvas(el, opts)
-      if (this.dead) return
-      this.cvSheetMat.map = this.tex(canvas)
-      this.cvSheetMat.needsUpdate = true
-    } catch {
-      /* the blank sheet is a fine fallback */
+  // Print the CV onto the loose papers and the label onto the notebook cover.
+  // Fire-and-forget: these are background details and must never hold up the book.
+  async paintDeskSurfaces(opts) {
+    const jobs = [
+      ['[data-cvsheet]', this.cvSheetMat],
+      ['[data-notebook]', this.notebookMat],
+    ]
+    for (const [selector, mat] of jobs) {
+      const el = this.pages && this.pages.querySelector(selector)
+      if (!el || !mat) continue
+      try {
+        const canvas = await html2canvas(el, opts)
+        if (this.dead) return
+        mat.map = this.tex(canvas)
+        mat.needsUpdate = true
+      } catch {
+        /* the plain surface is a fine fallback */
+      }
     }
   }
 
@@ -424,12 +430,13 @@ export default class BookEngine {
     this.deskFocus = true
     if (this.hooks.onAtDesk) this.hooks.onAtDesk(true)
 
-    if (kind === 'cv') {
-      clearTimeout(this._cvT)
-      // Registered with `after` so destroy() cancels it — otherwise an unmount
-      // during the 900ms camera move fires setState on a dead component.
-      this._cvT = this.after(900, () => {
-        if (!this.dead && this.hooks.onCV) this.hooks.onCV(true)
+    // Both panels wait for the camera to settle on the desk before appearing.
+    // Registered with `after` so destroy() cancels them — otherwise an unmount
+    // mid-move fires setState on a dead component.
+    if (kind === 'cv' || kind === 'note') {
+      clearTimeout(this._panelT)
+      this._panelT = this.after(900, () => {
+        if (!this.dead && this.hooks.onPanel) this.hooks.onPanel(kind)
       })
       return
     }

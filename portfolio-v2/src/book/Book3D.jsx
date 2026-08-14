@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import BookEngine from './BookEngine'
 import BookPages from './BookPages'
 import CVPanel from './CVPanel'
+import NotePanel from './NotePanel'
 import { intro as introCopy, meta, SHEETS, LABELS } from '../data/book'
 
 const MONO = "'IBM Plex Mono', monospace"
@@ -32,11 +33,11 @@ export default function Book3D() {
   const [failed, setFailed] = useState(false)
   const [atShelf, setAtShelf] = useState(false) // false = still in the study
   const [atDesk, setAtDesk] = useState(false)
-  const [cvOpen, setCvOpen] = useState(false)
-  // The engine reads this synchronously from its Escape handler, so it has to
-  // be a ref as well as state.
-  const cvOpenRef = useRef(false)
-  const openCV = (v) => { cvOpenRef.current = v; setCvOpen(v) }
+  // Which desk panel is showing: 'cv' | 'note' | null. The engine reads it
+  // synchronously from its Escape handler, so it is a ref as well as state.
+  const [panel, setPanel] = useState(null)
+  const panelRef = useRef(null)
+  const openPanel = (kind) => { panelRef.current = kind; setPanel(kind) }
 
   useEffect(() => {
     document.title = meta.title
@@ -59,8 +60,8 @@ export default function Book3D() {
         onFail: () => setFailed(true),
         onAtShelf: setAtShelf,
         onAtDesk: setAtDesk,
-        onCV: openCV,
-        isCVOpen: () => cvOpenRef.current,
+        onPanel: openPanel,
+        isPanelOpen: () => panelRef.current !== null,
       }
     )
     engine.start()
@@ -197,7 +198,8 @@ export default function Book3D() {
         {hintText}
       </div>
 
-      <CVPanel open={cvOpen} onClose={() => openCV(false)} />
+      <CVPanel open={panel === 'cv'} onClose={() => openPanel(null)} />
+      {panel === 'note' ? <NotePanel onClose={() => openPanel(null)} /> : null}
 
       <BookPages innerRef={pages} />
     </div>

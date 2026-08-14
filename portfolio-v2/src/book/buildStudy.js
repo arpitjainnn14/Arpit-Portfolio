@@ -164,10 +164,15 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   }
 
   // ——— clutter ————————————————————————————————————————————————
+  // The notebook you leave a note in — the pen is deliberately beside it.
+  const clothMat = new T.MeshStandardMaterial({ color: 0x2e3b44, roughness: 0.85 })
+  // Index 2 is the +Y face — the cover you look down on.
+  const coverMat = new T.MeshStandardMaterial({ color: 0x2e3b44, roughness: 0.85 })
   const notebook = new T.Mesh(
     new T.BoxGeometry(5.4, 0.7, 7.4),
-    new T.MeshStandardMaterial({ color: 0x2e3b44, roughness: 0.85 })
+    [clothMat, clothMat, coverMat, clothMat, clothMat, clothMat]
   )
+  out.notebookMat = coverMat
   notebook.position.set(-8.6, FL + 11.9, 2.4)
   notebook.rotation.y = 0.22
   notebook.castShadow = true
@@ -372,6 +377,7 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
 
   out.deskTargets = [
     { kind: 'cv', hit: papers, tint: [papers.material, cvSheet.material] },
+    { kind: 'note', hit: notebook, tint: [clothMat, coverMat] },
     { kind: 'lamp', hit: shade, tint: [shadeMat] },
     { kind: 'mug', hit: shell, tint: [ceramic] },
     { kind: 'pen', hit: pen, tint: [pen.material] },
