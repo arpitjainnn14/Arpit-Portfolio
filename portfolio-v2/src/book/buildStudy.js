@@ -458,6 +458,81 @@ export default function buildStudy(scene, tex, { trim, caseW, caseH, caseD }) {
   glass.position.z = 0.42
   art.add(glass)
 
+  // A working wall clock, hung opposite the print so the back wall isn't
+  // lopsided. The hands are driven from the real clock in BookEngine.step(),
+  // which is the one thing in the room that proves it's live rather than a
+  // pretty still life.
+  const clockFace = document.createElement('canvas')
+  clockFace.width = clockFace.height = 512
+  {
+    const g = clockFace.getContext('2d')
+    g.fillStyle = '#efe7d5'
+    g.beginPath()
+    g.arc(256, 256, 256, 0, Math.PI * 2)
+    g.fill()
+    // minute ticks, with the hours longer and darker
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * Math.PI * 2 - Math.PI / 2
+      const hour = i % 5 === 0
+      const r1 = hour ? 198 : 214
+      g.strokeStyle = hour ? 'rgba(52,40,24,.85)' : 'rgba(52,40,24,.3)'
+      g.lineWidth = hour ? 8 : 3
+      g.beginPath()
+      g.moveTo(256 + Math.cos(a) * r1, 256 + Math.sin(a) * r1)
+      g.lineTo(256 + Math.cos(a) * 230, 256 + Math.sin(a) * 230)
+      g.stroke()
+    }
+    g.fillStyle = '#3a2812'
+    g.textAlign = 'center'
+    g.textBaseline = 'middle'
+    g.font = '500 64px "IBM Plex Mono", monospace'
+    ;[[12, 0], [3, 90], [6, 180], [9, 270]].forEach(([n, deg]) => {
+      const a = (deg * Math.PI) / 180 - Math.PI / 2
+      g.fillText(String(n), 256 + Math.cos(a) * 156, 256 + Math.sin(a) * 156)
+    })
+  }
+
+  const wallClock = new T.Group()
+  wallClock.position.set(-25, FL + 35, -6.3)
+  wallClock.rotation.z = -0.014 // hung by hand, like the print
+  scene.add(wallClock)
+
+  const clockCase = new T.Mesh(new T.CylinderGeometry(5, 5, 0.8, 44), trim)
+  clockCase.rotation.x = Math.PI / 2
+  clockCase.castShadow = true
+  wallClock.add(clockCase)
+
+  const dial = new T.Mesh(
+    new T.CircleGeometry(4.5, 52),
+    new T.MeshStandardMaterial({ map: tex(clockFace), roughness: 0.92 })
+  )
+  dial.position.z = 0.42
+  wallClock.add(dial)
+
+  // Each hand is a box offset inside a group, so the group's z-rotation swings
+  // it about the dial's centre rather than its own.
+  const handMat = new T.MeshStandardMaterial({ color: 0x2a1d10, roughness: 0.6 })
+  const secondMat = new T.MeshStandardMaterial({ color: 0x8f3a18, roughness: 0.5 })
+  const makeHand = (len, w, z, mat) => {
+    const pivot = new T.Group()
+    const arm = new T.Mesh(new T.BoxGeometry(w, len, 0.09), mat)
+    arm.position.y = len / 2 - 0.35 // a little tail past the centre
+    pivot.add(arm)
+    pivot.position.z = z
+    wallClock.add(pivot)
+    return pivot
+  }
+  out.clockHands = {
+    hour: makeHand(2.5, 0.36, 0.46, handMat),
+    minute: makeHand(3.6, 0.26, 0.5, handMat),
+    second: makeHand(4.0, 0.1, 0.54, secondMat),
+  }
+
+  const boss = new T.Mesh(new T.CylinderGeometry(0.3, 0.3, 0.16, 20), penTrim)
+  boss.rotation.x = Math.PI / 2
+  boss.position.z = 0.58
+  wallClock.add(boss)
+
   // a plant in the corner, leaves as a few tilted cones
   const pot = new T.Mesh(
     new T.CylinderGeometry(1.5, 1.15, 2.6, 20),

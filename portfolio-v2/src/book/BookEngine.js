@@ -1024,6 +1024,20 @@ export default class BookEngine {
     if (this.wallWash) this.wallWash.intensity *= 0.06 + 0.94 * this._lit
     if (this.lampSpot) this.lampSpot.intensity = this.lampSpotFull * this._lit * (this._roomLast || 0)
 
+    // ——— the wall clock, telling the actual time ———
+    // The second hand steps rather than sweeps, the way a real one does; the
+    // minute and hour hands creep continuously off the fractional value.
+    if (this.clockHands) {
+      const d = new Date()
+      const sec = Math.floor(d.getSeconds())
+      const min = d.getMinutes() + d.getSeconds() / 60
+      const hr = (d.getHours() % 12) + min / 60
+      const TAU = Math.PI * 2
+      this.clockHands.second.rotation.z = -(sec / 60) * TAU
+      this.clockHands.minute.rotation.z = -(min / 60) * TAU
+      this.clockHands.hour.rotation.z = -(hr / 12) * TAU
+    }
+
     // ——— the mug: four sips, then an empty cup and a ring stain ———
     // The design snapped straight to each new level, which read as a glitch
     // rather than a sip. Ease toward it instead, and fade the surface out at
