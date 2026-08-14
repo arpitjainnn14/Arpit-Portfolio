@@ -62,6 +62,7 @@ export default class BookEngine {
 
   start() {
     this.bindUI()
+    this.planEntrance()
     this.boot()
   }
 
@@ -328,8 +329,10 @@ export default class BookEngine {
       pg.fillStyle = '#f5eedd'
       pg.fillRect(0, 0, 8, 8)
 
-      // Rasterise what the reader sees first; the rest streams in behind them.
-      const first = [0, 1, 2, 3, 10]
+      // Only the cover is needed to put the book on the shelf. Every other face
+      // streams in behind the reader, prioritised by how close it is to the
+      // spread they're on — so the scene appears in one rasterise, not five.
+      const first = [0]
       const canvases = new Array(faces.length).fill(ph)
       for (const i of first) canvases[i] = await html2canvas(faces[i], opts)
       if (this.dead) return
@@ -348,10 +351,11 @@ export default class BookEngine {
           if (this.loader) this.loader.style.display = 'none'
         })
       }
-      this.startIntro()
       this.fromHash()
     } catch (err) {
       console.error('3D book failed to build:', err)
+      // Don't strand the reader behind a title card that will never lift.
+      this.dismissEntrance()
       if (this.hooks.onFail) this.hooks.onFail(err)
     }
   }
@@ -367,9 +371,12 @@ export default class BookEngine {
     return t
   }
 
-  startIntro() {
-    // ?intro=1 replays the entrance regardless — it's meant to be seen once per
-    // visitor, which makes it awkward to look at while you're building it.
+  // The entrance doubles as the loading screen. It starts immediately — before
+  // fonts and before any rasterising — so the reader is looking at the title
+  // card during the work that used to leave them staring at a spinner.
+  planEntrance() {
+    // ?intro=1 replays it regardless; it's meant to be seen once per visitor,
+    // which makes it awkward to look at while you're building it.
     const always = new URLSearchParams(window.location.search).get('intro') === '1'
     let seen = false
     try {
@@ -377,29 +384,49 @@ export default class BookEngine {
     } catch {
       /* private mode */
     }
-    if ((!always && seen) || this.reduced || (!always && window.location.hash)) {
+    this.entrancePlays = !((!always && seen) || this.reduced || (!always && window.location.hash))
+    if (!this.entrancePlays) {
       this.intro = 1
       return
     }
     // The engine owns only the camera arrival (`this.intro`, eased in step()).
-    // The title card itself is DOM, so React drives it — animating it
-    // imperatively from here fights React's own style reconciliation.
+    // The card itself is DOM, so React drives it from these phase calls —
+    // animating it imperatively from here fights React's style reconciliation.
     this.intro = 0
     this.introT = 0
-    const phase = (n) => { if (this.hooks.onIntroPhase) this.hooks.onIntroPhase(n) }
+    this.entranceStart = Date.now()
     if (this.hooks.onIntroActive) this.hooks.onIntroActive(true)
-    phase(0)
-    this.after(260, () => phase(1)) // name rises
-    this.after(1500, () => phase(2)) // subtitle joins it
-    this.after(3600, () => phase(3)) // everything dissolves into the room
-    this.after(4700, () => {
-      if (this.hooks.onIntroActive) this.hooks.onIntroActive(false)
-      try {
-        localStorage.setItem('ajBookIntroSeen', '1')
-      } catch {
-        /* fine */
-      }
+    this.phase(0)
+    this.after(260, () => this.phase(1)) // name rises
+    this.after(1500, () => this.phase(2)) // subtitle joins it
+    // Phase 3 is deliberately not scheduled here: the card holds until the
+    // scene behind it is actually built, however long that takes.
+  }
+
+  phase(n) {
+    if (this.hooks.onIntroPhase) this.hooks.onIntroPhase(n)
+  }
+
+  // Called once the scene exists. The card dissolves into it — never before
+  // its designed 3.6s, and never before there is something to dissolve into.
+  sceneReady() {
+    if (!this.entrancePlays) return
+    const elapsed = Date.now() - this.entranceStart
+    this.after(Math.max(3600 - elapsed, 400), () => {
+      this.phase(3)
+      this.after(1100, () => this.dismissEntrance())
     })
+  }
+
+  dismissEntrance() {
+    if (!this.entrancePlays) return
+    this.entrancePlays = false
+    if (this.hooks.onIntroActive) this.hooks.onIntroActive(false)
+    try {
+      localStorage.setItem('ajBookIntroSeen', '1')
+    } catch {
+      /* fine */
+    }
   }
 
   // Print the CV onto the loose papers and the label onto the notebook cover.
@@ -753,6 +780,7 @@ export default class BookEngine {
     this.frames = 0
     window.__book = this // debug handle, as in the design source
     this.loop()
+    this.sceneReady()
   }
 
   // Bend one sheet: walk the width in COLS steps, turning by a base angle plus a
