@@ -3,5 +3,8 @@
   "framework": null,
   "installCommand": "npm --prefix portfolio-v2 install",
   "buildCommand": "npm --prefix portfolio-v2 run build",
-  "outputDirectory": "portfolio-v2/dist"
+  "outputDirectory": "portfolio-v2/dist",
+  "git": {
+    "deploymentEnabled": false
+  }
 }
