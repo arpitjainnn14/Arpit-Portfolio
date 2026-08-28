@@ -5,8 +5,12 @@ import FlatBook from './flat/FlatBook'
 // should never pay to download it — hence the lazy import.
 const Book3D = lazy(() => import('./book/Book3D'))
 
-// The 3D book needs WebGL and a desk-sized window — the same thresholds the
-// design used. Everything else gets the flat edition, which is a real read
+// The 3D book needs WebGL and a desk-sized window. Coarse-pointer devices
+// used to be turned away outright, but that also caught iPads and touch
+// laptops that render the room fine — so the gate is viewport-only now, and
+// the coarse-pointer signal instead feeds BookEngine's mobile tuning
+// profile (see BookEngine's `this.mobile`). Phones stay under the width
+// threshold either way and still get the flat edition, which is a real read
 // rather than a "come back on desktop" sign.
 function canRender3D() {
   // ?view=flat / ?view=3d forces an edition — handy for checking the phone
@@ -24,8 +28,7 @@ function canRender3D() {
     }
   })()
   const tooSmall = window.innerWidth < 820 || window.innerHeight < 460
-  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches
-  return hasGL && !tooSmall && !coarse
+  return hasGL && !tooSmall
 }
 
 // Shown while the book chunk downloads. Matches the loader inside Book3D so the

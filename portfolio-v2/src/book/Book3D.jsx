@@ -38,6 +38,12 @@ export default function Book3D() {
   const [panel, setPanel] = useState(null)
   const panelRef = useRef(null)
   const openPanel = (kind) => { panelRef.current = kind; setPanel(kind) }
+  // Same test as BookEngine's `this.mobile` (perf tuning profile) — computed
+  // independently here since the hint copy is plain React state, not
+  // something the engine drives directly.
+  const [mobile] = useState(
+    () => window.innerWidth < 1100 || !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+  )
 
   useEffect(() => {
     document.title = meta.title
@@ -79,7 +85,9 @@ export default function Book3D() {
     ? 'esc to step back'
     : atShelf
       ? 'find my book on the shelf — click it'
-      : 'click the bookcase · drag to look around'
+      : mobile
+        ? 'tap the bookcase · drag to look around'
+        : 'click the bookcase · drag to look around'
 
   return (
     <div
@@ -189,13 +197,25 @@ export default function Book3D() {
 
       <div
         style={{
-          position: 'absolute', left: 0, right: 0, top: 46, textAlign: 'center',
-          fontFamily: MONO, fontSize: 11, letterSpacing: '.28em', textTransform: 'uppercase',
+          // Right padding is wider than left so the hint's right edge always
+          // clears the skip chip (hotspots.js: right:28px, ~210px wide) —
+          // 28 + ~210 + a margin — instead of colliding with it on narrow
+          // desktop widths. top:26 is deliberate (clears the wall clock) —
+          // do not move it.
+          position: 'absolute', left: 0, right: 0, top: 26, textAlign: 'center', padding: '0 260px 0 200px',
+          // The asymmetric padding clears the skip chip on the right, leaving
+          // ~360px at the 820px minimum viewport. The longest string reachable
+          // there is 'tap the bookcase · drag to look around' (38 chars — the
+          // mobile branch always wins below 1100px, so the 40-char 'click'
+          // variant cannot appear at this width), which needs ~297px once the
+          // clamps bite. Clamping type size and tracking shrinks it only where
+          // it is tight; at desktop widths both sit at their maxima, unchanged.
+          fontFamily: MONO, fontSize: 'clamp(9px, 1.1vw, 11px)', letterSpacing: 'clamp(.14em, .3vw, .28em)', textTransform: 'uppercase',
           color: '#cba066', animation: hintAnim, opacity: hintOpacity,
           zIndex: 4, pointerEvents: 'none', transition: 'opacity 500ms linear',
         }}
       >
-        {hintText}
+        <span style={{ padding: '6px 16px', borderRadius: 999, background: 'rgba(12,9,6,.72)', border: '1px solid rgba(203,160,102,.14)', backdropFilter: 'blur(6px)' }}>{hintText}</span>
       </div>
 
       <CVPanel open={panel === 'cv'} onClose={() => openPanel(null)} />

@@ -4,6 +4,7 @@ a { color: #a8551f; text-decoration: none; }
 
 @keyframes hintPulse { 0%, 100% { opacity: .35; } 50% { opacity: .95; } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes ringPulse { 0% { transform: scale(.6); opacity: .85; } 100% { transform: scale(2.6); opacity: 0; } }
 
 /* Hover states for the nav pill. The engine writes `opacity` on the arrows and
    `color` on the sound toggle inline, so the sound rule needs !important to win. */

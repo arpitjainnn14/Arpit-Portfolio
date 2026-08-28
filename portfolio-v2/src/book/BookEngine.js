@@ -1,8 +1,10 @@
 import * as THREE from 'three'
 import html2canvas from 'html2canvas'
 import { SHEETS, SLUGS, LABELS, meta } from '../data/book'
-import buildStudy from './buildStudy'
+import buildStudy from './study'
 import buildBookcase, { CASE } from './buildBookcase'
+import HotspotLayer from './hotspots'
+import AmbientAudio from './ambient'
 
 // A direct port of the scene logic from the claude.ai/design source
 // ("Arpit Jain - Book Portfolio 3D.dc.html"). Every constant, easing curve and
@@ -50,8 +52,16 @@ export default class BookEngine {
     this.signProgress = 0
     this.listeners = []
     this.timers = []
+    // Constructible without touching the Web Audio API — nothing audible
+    // happens until the sound chip (or the nav-pill toggle) is clicked.
+    this.ambient = new AmbientAudio()
 
     this.reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    // Drives the perf tuning profile (FOV, pixel ratio cap, raster scale,
+    // dust count, shadow map sizes, rain fps) — a wider net than the
+    // App.jsx flat-vs-3D gate, since a room that renders fine on an iPad can
+    // still want the lighter-weight settings a touch device implies.
+    this.mobile = window.innerWidth < 1100 || !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
     if (this.mount) {
       this.mount.setAttribute(
         'aria-label',
@@ -71,6 +81,7 @@ export default class BookEngine {
   destroy() {
     this.dead = true
     if (this.raf) cancelAnimationFrame(this.raf)
+    if (this.hotspots) this.hotspots.dispose()
     this.listeners.forEach(([target, type, fn]) => target.removeEventListener(type, fn))
     this.listeners = []
     this.timers.forEach(clearTimeout)
@@ -92,7 +103,7 @@ export default class BookEngine {
         this.renderer.domElement.parentNode.removeChild(this.renderer.domElement)
       }
     }
-    if (this.actx && this.actx.state !== 'closed') this.actx.close()
+    if (this.ambient) this.ambient.dispose()
     if (window.__book === this) delete window.__book
   }
 
@@ -140,14 +151,10 @@ export default class BookEngine {
     if (this.prevEl) this.on(this.prevEl, 'click', () => this.go(-1))
     if (this.nextEl) this.on(this.nextEl, 'click', () => this.go(1))
 
-    this.soundOn = false
     if (this.soundEl) {
       this.on(this.soundEl, 'click', (e) => {
         e.stopPropagation()
-        this.soundOn = !this.soundOn
-        this.soundEl.textContent = this.soundOn ? 'sound on' : 'sound off'
-        this.soundEl.style.color = this.soundOn ? '#cba066' : '#6f6046'
-        if (this.soundOn) this.rustle()
+        this.toggleSound()
       })
     }
 
@@ -194,6 +201,12 @@ export default class BookEngine {
       this.on(this.mount, 'click', (e) => {
         if (this.dragMoved > 8) { this.dragMoved = 0; return } // that was a drag
         if (this.roomStage) {
+          // The turntable, the cat and her tail don't zoom the camera to a
+          // desk close-up like the other desk objects — they act in place —
+          // so they're routed around deskAction() rather than through it.
+          if (this.deskHover === 'vinyl') { this.toggleVinyl(); return }
+          if (this.deskHover === 'cat') { this.pet(); return }
+          if (this.deskHover === 'tail') { this.flickTail(); return }
           if (this.deskHover) { this.deskAction(this.deskHover); return }
           if (this.deskFocus) {
             this.deskFocus = false
@@ -203,7 +216,7 @@ export default class BookEngine {
           if (this.caseHover) {
             this.roomStage = false
             if (this.hooks.onAtShelf) this.hooks.onAtShelf(true)
-            this.rustle()
+            this.ambient.rustle()
           }
           return
         }
@@ -227,42 +240,34 @@ export default class BookEngine {
     }
   }
 
-  // ——— page-turn sound ————————————————————————————————————————
+  // ——— sound ——————————————————————————————————————————————————
 
-  rustle() {
-    if (!this.soundOn) return
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext
-      if (!AC) return
-      this.actx = this.actx || new AC()
-      const ctx = this.actx
-      if (ctx.state === 'suspended') ctx.resume()
-      if (!this.noise) {
-        const len = Math.floor(ctx.sampleRate * 0.5)
-        this.noise = ctx.createBuffer(1, len, ctx.sampleRate)
-        const d = this.noise.getChannelData(0)
-        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len)
-      }
-      const src = ctx.createBufferSource()
-      src.buffer = this.noise
-      const bp = ctx.createBiquadFilter()
-      bp.type = 'bandpass'
-      bp.Q.value = 0.8
-      const t = ctx.currentTime
-      bp.frequency.setValueAtTime(900, t)
-      bp.frequency.exponentialRampToValueAtTime(3200, t + 0.26)
-      const g = ctx.createGain()
-      g.gain.setValueAtTime(0.0001, t)
-      g.gain.exponentialRampToValueAtTime(0.16, t + 0.05)
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.42)
-      src.connect(bp)
-      bp.connect(g)
-      g.connect(ctx.destination)
-      src.start(t)
-      src.stop(t + 0.5)
-    } catch {
-      /* audio is a nicety */
+  // Both the in-book nav-pill and the HotspotLayer's overlay chip drive this,
+  // so they always agree on AmbientAudio's actual on/off state.
+  toggleSound() {
+    const on = this.ambient.toggle()
+    if (this.soundEl) {
+      this.soundEl.textContent = on ? 'sound on' : 'sound off'
+      this.soundEl.style.color = on ? '#cba066' : '#6f6046'
     }
+    if (this.hotspots) this.hotspots.setSoundOn(on)
+  }
+
+  // The turntable: clicking it (the 3D proxy or the hotspot pill — both land
+  // here) drops or lifts the needle. While sound is off the needle is always
+  // down already (nothing has ever toggled it), so a click there just turns
+  // sound on rather than also flipping the needle up — flipping it first would
+  // leave the newly-enabled sound with nothing playing, i.e. the needle drop
+  // would be a mime.
+  toggleVinyl() {
+    if (!this.toggle) return
+    if (!this.ambient.on) {
+      this.toggleSound()
+      return
+    }
+    const playing = this.toggle()
+    this.ambient.setVinyl(playing)
+    if (this.hotspots) this.hotspots.setLabel('vinyl', playing ? 'now playing' : 'drop the needle')
   }
 
   // ——— navigation ————————————————————————————————————————————
@@ -286,7 +291,7 @@ export default class BookEngine {
       if (d > 0) {
         this.roomStage = false
         if (this.hooks.onAtShelf) this.hooks.onAtShelf(true)
-        this.rustle()
+        this.ambient.rustle()
       }
       return
     }
@@ -294,7 +299,7 @@ export default class BookEngine {
     if (n === this.f) return
     this.f = n
     this.pump()
-    this.rustle()
+    this.ambient.rustle()
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', '#' + this.SLUGS[n])
     }
@@ -316,10 +321,14 @@ export default class BookEngine {
       if (this.dead) return
 
       const faces = Array.from(this.pages.querySelectorAll('[data-face]'))
-      // The design used *1.1. Pages are read at an angle, so the texture needs
-      // headroom above its on-screen size or the type goes soft — 700px wide
-      // faces rasterise to ~2450px here.
-      const scale = Math.min(2, window.devicePixelRatio || 1) * 1.75
+      // The design used *1.1 desktop / *0.72 mobile. Pages are read at an
+      // angle, so the texture needs headroom above its on-screen size or the
+      // type goes soft — 700px wide faces rasterise to ~2450px here on
+      // desktop. Taking the design's 0.72 literally would put mobile text at
+      // 41% of the desktop baseline instead of its intended 65%, so mobile
+      // uses 1.15 instead — proportionally the same relative cut, off this
+      // repo's sharper 1.75 desktop baseline.
+      const scale = Math.min(2, window.devicePixelRatio || 1) * (this.mobile ? 1.15 : 1.75)
       const opts = { scale, backgroundColor: null, logging: false, useCORS: true }
 
       const ph = document.createElement('canvas')
@@ -456,6 +465,7 @@ export default class BookEngine {
   deskAction(kind) {
     this.deskFocus = true
     if (this.hooks.onAtDesk) this.hooks.onAtDesk(true)
+    if (this.hotspots) this.hotspots.setFound(kind)
 
     // Both panels wait for the camera to settle on the desk before appearing.
     // Registered with `after` so destroy() cancels them — otherwise an unmount
@@ -596,9 +606,10 @@ export default class BookEngine {
     this.COLS = COLS
 
     const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
-    // The design capped at 1.6, which renders below native on a Retina display
-    // and softens everything. Render at full density instead.
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
+    // The design capped at 1.6 across the board. Desktop keeps that cap;
+    // mobile — now carrying a cat, a turntable, rain and ~12 lights — drops
+    // to a tighter 1.2 so a mid-range phone/tablet GPU isn't overdrawing.
+    renderer.setPixelRatio(Math.min(this.mobile ? 1.2 : 1.6, window.devicePixelRatio || 1))
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = T.PCFSoftShadowMap
     renderer.toneMapping = T.ACESFilmicToneMapping
@@ -610,13 +621,17 @@ export default class BookEngine {
 
     const scene = new T.Scene()
     this.scene = scene
-    const camera = new T.PerspectiveCamera(34, 1, 0.1, 200)
+    // A wider FOV on mobile keeps the room legible on a cramped/portrait
+    // touch viewport without the reader having to orbit as much.
+    const camera = new T.PerspectiveCamera(this.mobile ? 46 : 34, 1, 0.1, 200)
     this.camera = camera
 
-    scene.add(new T.HemisphereLight(0xffe6c2, 0x24190d, 1.45))
+    const hemi = new T.HemisphereLight(0xffe9c8, 0x4a3520, 1.5)
+    this.hemi = hemi
+    scene.add(hemi)
     // Raised from the design's 0.9 — this is what lifts the key light's
     // self-shadow off the open spread so the page underneath stays readable.
-    const fill = new T.DirectionalLight(0xfff0d8, 1.45)
+    const fill = new T.DirectionalLight(0xfff0d8, 1.05)
     fill.position.set(6, 10, 14)
     scene.add(fill)
     const key = new T.DirectionalLight(0xffe3b4, 2.6)
@@ -627,9 +642,13 @@ export default class BookEngine {
     // The frustum has to cover the whole study, or the room casts a hard black
     // polygon on the back wall where the shadow map runs out. But a frustum
     // that wide spreads the map thin — at the desk close-up each texel was
-    // several screen pixels, which is what made the desk and chair look blocky.
-    // 4096 halves the texel size; the frustum is trimmed to what's actually lit.
-    key.shadow.mapSize.set(4096, 4096)
+    // several screen pixels, which is what made the desk and chair look
+    // blocky. 4096 on desktop is deliberate: it halves that texel size, and
+    // the frustum below is trimmed to what's actually lit to help further.
+    // Mobile drops to 1024² — the lamp spot's own shadow is off there
+    // entirely (study/desk.js), so the key light is the only shadow pass
+    // mobile pays for, and it can afford to be softer.
+    key.shadow.mapSize.set(this.mobile ? 1024 : 4096, this.mobile ? 1024 : 4096)
     key.shadow.radius = 8
     key.shadow.camera.left = -48
     key.shadow.camera.right = 48
@@ -648,23 +667,63 @@ export default class BookEngine {
     rim.position.set(10, 6, -10)
     scene.add(rim)
 
-    const floor = new T.Mesh(
-      new T.PlaneGeometry(200, 200),
-      new T.MeshStandardMaterial({ color: 0x140e08, roughness: 0.98 })
-    )
-    floor.rotation.x = -Math.PI / 2
-    floor.position.y = -17.2
-    floor.receiveShadow = true
-    scene.add(floor)
-
     // — the bookcase and its neighbours —
     buildBookcase(scene, (c) => this.tex(c))
     const { w: caseW, h: caseH, d: caseD } = CASE
 
     // ——— the study around the bookcase ———————————————————————
-    const trimMat = new T.MeshStandardMaterial({ color: 0x231810, roughness: 0.9 })
-    const study = buildStudy(scene, (c) => this.tex(c), { trim: trimMat, caseW, caseH, caseD })
+    // The floor and the trim material both moved into study/ in Task R1 —
+    // the floor lives in room.js now (same geometry/colour/roughness), and
+    // the trim colour is study/materials.js's shared.trimDark, threaded
+    // through buildStudy's own opts instead of being built and passed in
+    // from here.
+    const study = buildStudy(scene, (c) => this.tex(c), {
+      caseW, caseH, caseD,
+      renderer, hemi, engine: this, mobile: this.mobile || false,
+    })
+    this.studyUpdaters = study.updaters
+    delete study.updaters
     Object.assign(this, study)
+    // Must run after the assign above, not inside buildStudy/windows.js:
+    // it writes this.keyFull/floorLightFull/lampSpotFull, and an earlier
+    // call would just get overwritten by desk.js's own out.lampSpotFull = 150
+    // riding along in the same `study` bag (and by the floor lamp's own
+    // out.floorLightFull too).
+    if (this.applyDaylight) {
+      this.applyDaylight()
+      delete this.applyDaylight
+    }
+
+    this.hotspots = new HotspotLayer(this.mount, THREE, {
+      onDesk: () => {
+        if (!this.roomStage) return
+        this.deskFocus = true
+        if (this.hooks.onAtDesk) this.hooks.onAtDesk(true)
+      },
+      onSkip: () => {
+        if (!this.roomStage) return
+        this.deskFocus = false
+        this.roomStage = false
+        if (this.hooks.onAtDesk) this.hooks.onAtDesk(false)
+        if (this.hooks.onAtShelf) this.hooks.onAtShelf(true)
+        this.ambient.rustle()
+      },
+      onSound: () => this.toggleSound(),
+      onVinyl: () => this.toggleVinyl(),
+      onCat: () => this.pet(),
+      onTail: () => this.flickTail(),
+    })
+    ;[
+      { kind: 'cv', obj: this.papers },
+      { kind: 'lamp', obj: this.deskShade },
+      { kind: 'mug', obj: this.shell },
+      { kind: 'pen', obj: this.pen },
+      { kind: 'case', obj: this.caseHit },
+      { kind: 'desk', obj: this.desk },
+      { kind: 'vinyl', obj: this.vinylHit },
+      { kind: 'cat', obj: this.catHit },
+      { kind: 'tail', obj: this.catTailHit },
+    ].forEach((a) => this.hotspots.addAnchor(a))
 
     const lamp = new T.PointLight(0xffbe76, 90, 60, 2)
     lamp.position.set(-4, 16, 16)
@@ -749,7 +808,7 @@ export default class BookEngine {
 
     // — dust in the lamplight —
     const dustGeo = new T.BufferGeometry()
-    const N = 180
+    const N = this.mobile ? 70 : 180
     const pos = new Float32Array(N * 3)
     for (let i = 0; i < N; i++) {
       pos[i * 3] = (Math.random() - 0.5) * 26
@@ -1023,20 +1082,9 @@ export default class BookEngine {
     if (this.deskGlow) this.deskGlow.intensity *= 0.08 + 0.92 * this._lit
     if (this.wallWash) this.wallWash.intensity *= 0.06 + 0.94 * this._lit
     if (this.lampSpot) this.lampSpot.intensity = this.lampSpotFull * this._lit * (this._roomLast || 0)
-
-    // ——— the wall clock, telling the actual time ———
-    // The second hand steps rather than sweeps, the way a real one does; the
-    // minute and hour hands creep continuously off the fractional value.
-    if (this.clockHands) {
-      const d = new Date()
-      const sec = Math.floor(d.getSeconds())
-      const min = d.getMinutes() + d.getSeconds() / 60
-      const hr = (d.getHours() % 12) + min / 60
-      const TAU = Math.PI * 2
-      this.clockHands.second.rotation.z = -(sec / 60) * TAU
-      this.clockHands.minute.rotation.z = -(min / 60) * TAU
-      this.clockHands.hour.rotation.z = -(hr / 12) * TAU
-    }
+    if (this.floorLight) this.floorLight.intensity = this.floorLightFull * (0.22 + 0.78 * this._lit) * (0.35 + 0.65 * room)
+    if (this.floorShadeMat) this.floorShadeMat.emissiveIntensity = 0.12 + 0.4 * this._lit
+    if (this.shelfWash) this.shelfWash.intensity = this.shelfWashFull * (0.3 + 0.7 * this._lit)
 
     // ——— the mug: four sips, then an empty cup and a ring stain ———
     // The design snapped straight to each new level, which read as a glitch
@@ -1081,6 +1129,17 @@ export default class BookEngine {
         p.sp.scale.setScalar(0.55 + t * 2.5)
         p.sp.material.opacity =
           Math.sin(Math.min(1, t / 0.85) * Math.PI) * 0.32 * near * Math.min(1, arrive * 1.2)
+      }
+    }
+
+    if (this.studyUpdaters) {
+      // `lit` (eased lamp-on/off) is provided for updaters and currently
+      // unread — the lamp-dimming it was meant for lives in this engine's
+      // own light block instead.
+      const ctx = { lit: this._lit, room, arrive, elapsed: this.clock.elapsedTime, camera: this.camera }
+      for (const u of this.studyUpdaters) u(dt, ctx)
+      if (this.hotspots) {
+        this.hotspots.update(ctx, { deskFocus: this.deskFocus, deskHover: this.deskHover, caseHover: this.caseHover })
       }
     }
 

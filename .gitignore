@@ -15,5 +15,6 @@ dist/
 # reference for the 3D book — every animation constant in BookEngine.js comes
 # from it — but it is not part of the shipped site.
 Interactive Book Portfolio Design/
+Interactive Book Portfolio Design 2/
 .vercel
 .env*
