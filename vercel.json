@@ -5,6 +5,6 @@
   "buildCommand": "npm --prefix portfolio-v2 run build",
   "outputDirectory": "portfolio-v2/dist",
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": true
   }
 }
